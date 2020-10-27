@@ -35,7 +35,7 @@ The combat will be carried out through actions taken by each player (or AI) in a
 - Fight another players and become the invincible one.
 - Strategic battle system where your decisions and not the luck decide the result.
 
-## Similar competitive products.
+## Similar competitive products
 
 - [Battle Knight](https://en.battleknight.gameforge.com/)
 - [Night House](http://play2.textadventures.co.uk/Play.aspx?id=7nwoee9ope2_hvfrx8kjvw)
