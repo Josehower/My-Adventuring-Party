@@ -40,6 +40,3 @@ The combat will be carried out through actions taken by each player (or AI) in a
 - [Battle Knight](https://en.battleknight.gameforge.com/)
 - [Night House](http://play2.textadventures.co.uk/Play.aspx?id=7nwoee9ope2_hvfrx8kjvw)
 - [Thorn](https://www.torn.com/)
-- [The Dreamhold](https://eblong.com/zarf/zweb/dreamhold/)
-- [Gladiatue](https://lobby.gladiatus.gameforge.com/en_GB/hub)
-- [Draygun and the Presence Chapter One](http://textadventures.co.uk/games/play/zxtkobhnu0cjub6al_4jzq)
