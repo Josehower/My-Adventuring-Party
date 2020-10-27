@@ -1,29 +1,29 @@
-# INDEX
+## Game Play
 
-- [Linked Header](#head-id)
+In My Adventuring Party the gameplay is divided on two diferent phases:
 
-# My-Adventuring-Party
+  - ## Party Managment
 
-~~esto~~ es un _simple italic_ **bold** parrafo
+    This phase is where the player create and manage his party of **HELDEN**, he uses gold to buy items that allow him to improve the stats of his team members, in order to make them powerfull and win battles easily. The player can have up to fifteen **HELDEN** but he can only use five into battle, what allow the player create different party compositions as needed.
 
-<https:/wesbos.com>
+    ### HELDEN stats
 
-[my nice repo](https://github.com/Josehower/My-Adventuring-Party 'Repo of this amazing game')
+    Each **HELDEN** has a limited set of **skill stats** at a certain point that can only be overcome by leveling up. To unlock a higher level for a **HELDEN**, the player must reach a minimum amount of total **skill stats**. This minimum amount of total **skill stats** to level up will grow exponentially, making each level more and more difficult to acquire.
 
-this is a big paragraph Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam libero nunc, laoreet eu pharetra eleifend, tincidunt nec dui. Suspendisse tincidunt semper eros eu sagittis. Mauris sit amet auctor libero. Aenean suscipit suddently i want a **big url link** but i still want that md is readable [click Here][biglink] placerat erat, vulputate sodales augue viverra egestas. In fermentum massa dolor, vitae auctor mi sagittis non. Donec eget tortor nec nibh porttitor vestibulum. Vestibulum sodales, erat eu vehicula elementum, neque orci dapibus lectus, bibendum vestibulum dolor massa et magna. Suspendisse vulputate libero est, vel lacinia turpis dictum porttitor.
+    after **level 10**, the requirement to level up wouldnt be only skillstats but also spending **SOUL STONES** which are the most hard resource to get on the game.
 
-Donec vel libero vitae elit scelerisque rhoncus. Nulla non nibh eu diam ornare pulvinar. Pellentesque sollicitudin ex at enim scelerisque, quis rhoncus mauris scelerisque. Sed sapien odio, tempus et dignissim vel, bibendum nec tellus. Nullam eu scelerisque massa, a ullamcorper massa. Etiam ut finibus nibh. Vestibulum facilisis porta aliquam. _the coolest Thing_ is after that i can use **the same Link** any place on the document using the same **square brackets** as [here][biglink] Maecenas dapibus congue purus id tincidunt. Fusce venenatis mauris faucibus quam semper, at venenatis eros sollicitudin. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed pharetra arcu enim, eget mattis leo blandit sed. Nullam condimentum, tellus porta vestibulum malesuada, nisl massa porta nisi, nec posuere risus diam et purus. Aliquam egestas turpis massa, ut semper turpis accumsan at.
+    ### ITEMS, GOLD and SOUL STONES
 
-[biglink]: https://www.google.com/search?q=lorem+ipsum&oq=lorem&aqs=chrome.0.0j69i57j0l6.1393j0j7&sourceid=chrome&ie=UTF-8
+    The gold on My Adventuring Party is the economy resource of the game. With this the player can buy items that allow him or her improve his or her team, or perform some actions on battle. The gold not only is used to buy items but, can be used to buy extra features as extra **HELDEN** slots or exceed the daily maximum battle encounters amount.
 
-![a nice image](https://unsplash.it/500/500?random 'This is a Tittle')
+    The player get gold overtime until the gold reach a cap, this cap can be augmented whit one special resource called **SOUL STONE** which is the most rare resource on the game.
 
-## this is a Header
+    The gold and sometimes items are the reward of the battles, soulStones can also be acquired from battles but this have a really low drop rate.
 
-Donec vel libero vitae elit scelerisque rhoncus. Nulla non nibh eu diam ornare pulvinar. Pellentesque sollicitudin ex at enim scelerisque, quis rhoncus mauris scelerisque. Sed sapien odio, tempus et dignissim vel, bibendum nec tellus. Nullam eu scelerisque massa, a ullamcorper massa. Etiam ut finibus nibh. Vestibulum facilisis porta aliquam. _the coolest Thing_ is after that i can use **the same Link** any place on the document using the same **square brackets** as [here][biglink] Maecenas dapibus congue purus id tincidunt. Fusce venenatis mauris faucibus quam semper, at venenatis eros sollicitudin. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed pharetra arcu enim, eget mattis leo blandit sed. Nullam condimentum, tellus porta vestibulum malesuada, nisl massa porta nisi, nec posuere risus diam et purus. Aliquam egestas turpis massa, ut semper turpis accumsan at.
+    the Soul Stones can be exchanged for gold but no gold can buy Soul Stones.
 
-## another header
+  - ## Battle mode
 
-Donec vel libero vitae elit scelerisque rhoncus. Nulla non nibh eu diam ornare pulvinar. Pellentesque sollicitudin ex at enim scelerisque, quis rhoncus mauris scelerisque. Sed sapien odio, tempus et dignissim vel, bibendum nec tellus. Nullam eu scelerisque massa, a ullamcorper massa. Etiam ut finibus nibh. Vestibulum facilisis porta aliquam. _the coolest Thing_ is after that i can use **the same Link** any place on the document using the same **square brackets** as [here][biglink] Maecenas dapibus congue purus id tincidunt. Fusce venenatis mauris faucibus quam semper, at venenatis eros sollicitudin. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed pharetra arcu enim, eget mattis leo blandit sed. Nullam condimentum, tellus porta vestibulum malesuada, nisl massa porta nisi, nec posuere risus diam et purus. Aliquam egestas turpis massa, ut semper turpis accumsan at.
+    The battle phase is where the action takes place, this is what makes My Adventure Party and strategy game. Here each of the parts involve on the battle (player vs player or player vs IA defined on GDD) would take turns to perform actions that would define the results of the battle.
 
-# <a id="head-id"></a> header linked here my man
+    Each player would decide in between different turns which actions to perform, the turn itself have some steps wich makes the strategic part of the game taking place.
