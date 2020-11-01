@@ -1,3 +1,24 @@
+compromisos para primer prototipo:
+
+- el barrel no sube nivel
+- no hay maximo de helden
+- impementar maximo de expediciones??
+- monstruos son semi fijos
+- no suddend death mode
+- los items solo van a ser consumibles
+- las cookies y las leches van a estar en un boton al lado del stat
+- incrementos por nivel aplicados desde el codigo
+- stats cap implementados desde codigo
+- class hability progresion implementados desde codigo
+- expedition duration implementadas desde codigo
+- acciones de combate implementadas desde codigo????
+- Only potions will be implemented
+
+action table
+loot table
+
+
+
 ## TABLE OF CONTENTS
 - [Game Progression](#game-progression)
   - [Stats](#stats)
@@ -576,6 +597,27 @@ This are items that allow the player perform actions on combat, this items are a
         - rarity: Phantom
 
 ---
+
+## Enemies
+
+each enemy have to be random generated based on his rarity and his types stats
+
+type_id          |       int
+___________________________________
+type_name        |       varchar(50)
+base_ve          |       int
+base_ap          |       int
+base_sd          |       int
+base_pd          |       int
+damage_nature    |       varchar(50)
+battle_position  |       varchar(50)
+ve_growth        |       int
+ap_growth        |       int
+lvl              |       int
+rarity           |       string
+
+
+
 
 _Fuera de prototipo up leveled
 aumentadores de base de ataque
