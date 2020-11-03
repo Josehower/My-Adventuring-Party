@@ -2,3 +2,6 @@ https://github.com/thorinaboenke/cheatsheets
 
 
 select * from players;
+
+
+insert into player_bag (item_id, game_id, qty) values (1,1,5);

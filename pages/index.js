@@ -1,11 +1,16 @@
 import Head from 'next/head';
-import SideBar from '../components/SideBar';
 import GoldContainer from '../components/GoldContainer';
 import { isSessionTokenValid } from '../utils/auth';
 import nextCookies from 'next-cookies';
 import { getGameByToken } from '../utils/account-database';
-import { getPlayerMoneyById } from '../utils/game-database';
+import {
+  getPlayerBagByGameId,
+  getPlayerMoneyById,
+  getStoreByGameId,
+} from '../utils/game-database';
 import { useEffect, useState } from 'react';
+import MariosStore from '../components/MariosStore';
+import PlayerBag from '../components/PlayerBag';
 
 export default function Home(props) {
   const [barrelAmount, setBarrelAmount] = useState(0);
@@ -44,6 +49,7 @@ export default function Home(props) {
         <title>Prototype</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <br />
       <GoldContainer
         barrel={barrelAmount}
         hitBarrel={hitBarrel}
@@ -52,7 +58,20 @@ export default function Home(props) {
         soulStones={soulStones}
         setSoulStones={setSoulStones}
       />
-      <SideBar />
+      <br />
+      <div>
+        <MariosStore store={props.store} />
+        <br />
+        <PlayerBag bag={props.bag} nick={props.nick} />
+        <br />
+        <div>EXPEDITIONS</div>
+        <br />
+        <div>HELDEN</div>
+        <br />
+        <div>STORY MODE</div>
+        <br />
+        <div>PVP</div>
+      </div>
     </div>
   );
 }
@@ -71,9 +90,10 @@ export async function getServerSideProps(context) {
   }
 
   const gameInstance = await getGameByToken(token);
-
-  const playerMoney = await getPlayerMoneyById(gameInstance.gameId);
-
+  const gameId = gameInstance.gameId;
+  const playerMoney = await getPlayerMoneyById(gameId);
+  const store = await getStoreByGameId(gameId);
+  const bag = await getPlayerBagByGameId(gameId);
   const lastBarrelHit = +playerMoney.lastHit;
 
   return {
@@ -83,6 +103,8 @@ export async function getServerSideProps(context) {
       lastBarrelHit,
       soulStones: playerMoney.soulStones,
       nick: playerMoney.nickName,
+      store,
+      bag,
     },
   };
 }

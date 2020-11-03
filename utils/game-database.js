@@ -23,6 +23,24 @@ export async function createGameInstance() {
     RETURNING *;
   `;
 
+  const itemsInventory = await sql`
+  SELECT * FROM items;
+  `;
+
+  const itemsPrepared = itemsInventory.map((item) => {
+    return {
+      item_id: item.item_id,
+      game_id: gameInstance[0].game_id,
+      is_locked: item.unlock_price === null ? false : true,
+    };
+  });
+
+  const newStore = await sql`
+    INSERT INTO marios_mexican_store
+    ${sql(itemsPrepared, 'item_id', 'game_id', 'is_locked')} RETURNING *`;
+
+  console.log(newStore);
+
   return camelcaseKeys(gameInstance[0]);
 }
 
@@ -38,4 +56,26 @@ export async function getPlayerMoneyById(id) {
         ON barrel.barrel_id = game.game_id where game.game_id = ${id};`;
 
   return camelcaseKeys(sizeOptions[0]);
+}
+
+export async function getStoreByGameId(id) {
+  const store = await sql`
+  SELECT items.name, items.price, store.is_locked
+    FROM marios_mexican_store as store
+    JOIN items ON store.item_id = items.item_id
+    WHERE store.game_id = ${id}
+;`;
+
+  return store.map((store) => camelcaseKeys(store));
+}
+
+export async function getPlayerBagByGameId(id) {
+  const store = await sql`
+  SELECT items.name, bag.qty
+    FROM player_bag as bag
+    JOIN items ON bag.item_id = items.item_id
+    WHERE bag.game_id = ${id}
+;`;
+
+  return store.map((store) => camelcaseKeys(store));
 }

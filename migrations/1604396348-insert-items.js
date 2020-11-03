@@ -55,7 +55,7 @@ const itemInventory = [
     unlock_price: 10,
   },
   {
-    name: "Jena's rounded baked cake",
+    name: "Jenna's rounded baked cake",
     price: 10000,
     description:
       'give a helden +10% on VE or AP stats (use an experience shard).',
@@ -87,18 +87,16 @@ const itemInventory = [
 ];
 
 exports.up = async (sql) => {
-  //TODO 1. fill type table up
   const types = await sql`
   INSERT INTO item_types ${sql(
     itemTypes,
     'type_name',
     'description',
   )} RETURNING *`;
-  //TODO 2. fill rarity table up
+
   const rarities = await sql`
 	INSERT INTO item_rarities ${sql(itemRarities, 'rarity_name')} RETURNING *`;
 
-  //TODO 3. map over the items array and map the type to item_type_id and the rarity to item_rarity_id delete type and rarity
   const itemsPrepared = itemInventory.map((item) => {
     const { item_type_id } = types.find((type) => type.type_name === item.type);
     const { item_rarity_id } = rarities.find(
@@ -110,7 +108,6 @@ exports.up = async (sql) => {
     return preparedItem;
   });
 
-  //TODO 4. fill items table up
   const items = await sql`
 	INSERT INTO items ${sql(
     itemsPrepared,
