@@ -5,7 +5,7 @@ exports.up = async (sql) => {
 		player_name varchar(50),
 		e_mail varchar(50),
 		nick_name varchar(50),
-		pw_hash varchar(50)
+		pw_hash varchar(100)
 	);`;
 
   await sql`
@@ -19,9 +19,9 @@ exports.up = async (sql) => {
 
 exports.down = async (sql) => {
   await sql`
-	DROP TABLE IF EXISTS player;
+	DROP TABLE IF EXISTS sessions;
 	`;
   await sql`
-	DROP TABLE IF EXISTS sessions;
+	DROP TABLE IF EXISTS players;
 	`;
 };

@@ -1,18 +1,21 @@
 import { useState } from 'react';
+import styled from 'styled-components';
 
-const GoldContainer = () => {
-  const [gold, setGold] = useState(0);
+const GoldButton = styled.button`
+  background: gold;
+`;
 
-  function createGold() {
-    let goldAmount = gold;
-    goldAmount++;
-    setGold(goldAmount);
+const GoldContainer = ({ barrel, hitBarrel, gold, setGold, soulStones }) => {
+  function barrelHandler() {
+    setGold(gold + barrel);
+    hitBarrel();
   }
-
   return (
     <div>
-      {gold}
-      <button onClick={createGold}>gold</button>
+      barrel - {barrel}
+      <GoldButton onClick={barrelHandler}>hitMe</GoldButton>
+      <br />$ - {gold}
+      <br />§ - {soulStones}
     </div>
   );
 };

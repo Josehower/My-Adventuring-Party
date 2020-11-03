@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import Link from 'next/link';
 
 const Error = styled.div`
   color: red;
@@ -14,14 +15,14 @@ const register = ({ token }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
-  async function onSubmit({ username, email, password, nickname }) {
+  async function onSubmit({ playerName, email, password, nickname }) {
     const response = await fetch('/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        username,
+        playerName,
         email,
         password,
         nickname,
@@ -33,47 +34,37 @@ const register = ({ token }) => {
     if (success) {
       router.push('/');
     } else {
-      console.log(response.status);
-      setErrorMessage('fail');
+      const statusObj = {
+        409: 'this player already exist',
+        500: 'there was a problem with the database',
+      };
+
+      const message = statusObj[response.status];
+
+      setErrorMessage(message ? message : 'unknown error');
     }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      username
+      palyerName
       <br />
-      <input
-        value="michael"
-        name="username"
-        ref={register({ required: true })}
-        type="text"
-      />
-      {errors.username && <Error>---{'>'} ups, this is required</Error>}
+      <input name="playerName" ref={register({ required: true })} type="text" />
+      {errors.playerName && <Error>---{'>'} ups, this is required</Error>}
       <br />
       email
       <br />
-      <input
-        value="michael-jordan@chicagobulls.com"
-        name="email"
-        ref={register({ required: true })}
-        type="text"
-      />
+      <input name="email" ref={register({ required: true })} type="text" />
       {errors.email && <Error>---{'>'} ups, this is required</Error>}
       <br />
       nickname
       <br />
-      <input
-        value="toro"
-        name="nickname"
-        ref={register({ required: true })}
-        type="text"
-      />
+      <input name="nickname" ref={register({ required: true })} type="text" />
       {errors.nickname && <Error>---{'>'} ups, this is required</Error>}
       <br />
       password
       <br />
       <input
-        value="123456"
         name="password"
         ref={register({ required: true })}
         type="password"
@@ -87,6 +78,9 @@ const register = ({ token }) => {
         </Error>
       )}
       <button>register</button>
+      <Link href="/login">
+        <a>logIn</a>
+      </Link>
     </form>
   );
 };
