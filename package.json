@@ -10,12 +10,15 @@
     "dbt": "yarn migrate down && yarn migrate up"
   },
   "dependencies": {
+    "@apollo/client": "^3.2.5",
+    "apollo-server-micro": "^2.19.0",
     "argon2": "^0.27.0",
     "camelcase-keys": "^6.2.2",
     "cookie": "^0.4.1",
     "csrf": "^3.1.0",
     "dotenv": "^8.2.0",
     "dotenv-cli": "^4.0.0",
+    "graphql": "^15.4.0",
     "ley": "^0.6.0",
     "next": "10.0.0",
     "next-cookies": "^2.0.3",

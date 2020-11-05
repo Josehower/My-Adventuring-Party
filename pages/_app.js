@@ -1,13 +1,19 @@
-import GlobalNav from '../components/GlobalNav';
 import GlobalStyle from '../styles/globalStyles';
+import GlobalNav from '../components/GlobalNav';
+import { ApolloProvider } from '@apollo/client';
+import { useApollo } from '../apollo/client';
 
 function MyApp({ Component, pageProps }) {
+  const apolloClient = useApollo(pageProps.initialApolloState);
+
   return (
     <>
       <GlobalStyle />
-      <GlobalNav>
-        <Component {...pageProps} />
-      </GlobalNav>
+      <ApolloProvider client={apolloClient}>
+        <GlobalNav>
+          <Component {...pageProps} />
+        </GlobalNav>
+      </ApolloProvider>
     </>
   );
 }

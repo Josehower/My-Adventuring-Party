@@ -3,6 +3,31 @@ import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useMutation, gql } from '@apollo/client';
+import { getErrorMessage } from '../lib/error';
+
+const createPlayerMutation = gql`
+  mutation createPlayer(
+    $playerName: String!
+    $email: String!
+    $password: String!
+    $nickname: String!
+    $token: String!
+  ) {
+    createPlayer(
+      input: {
+        playerName: $playerName
+        email: $email
+        password: $password
+        nickname: $nickname
+        token: $token
+      }
+    ) {
+      playerName
+      nickName
+    }
+  }
+`;
 
 const Error = styled.div`
   color: red;
@@ -11,37 +36,26 @@ const Error = styled.div`
 `;
 
 const register = ({ token }) => {
+  const [registerPlayer] = useMutation(createPlayerMutation);
   const { register, handleSubmit, errors } = useForm();
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   async function onSubmit({ playerName, email, password, nickname }) {
-    const response = await fetch('/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        playerName,
-        email,
-        password,
-        nickname,
-        token,
-      }),
-    });
-    const { success } = await response.json();
+    try {
+      await registerPlayer({
+        variables: {
+          playerName: playerName,
+          email: email,
+          password: password,
+          nickname: nickname,
+          token: token,
+        },
+      });
 
-    if (success) {
-      router.push('/');
-    } else {
-      const statusObj = {
-        409: 'this player already exist',
-        500: 'there was a problem with the database',
-      };
-
-      const message = statusObj[response.status];
-
-      setErrorMessage(message ? message : 'unknown error');
+      router.push('/login');
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error));
     }
   }
 

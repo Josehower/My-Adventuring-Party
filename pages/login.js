@@ -5,6 +5,16 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useMutation, gql } from '@apollo/client';
+
+const loginPlayerMutation = gql`
+  mutation loginPlayer($playerName: String!, $password: String!) {
+    loginPlayer(input: { playerName: $playerName, password: $password }) {
+      playerName
+      nickName
+    }
+  }
+`;
 
 const Error = styled.div`
   color: red;
@@ -13,33 +23,24 @@ const Error = styled.div`
 `;
 
 const login = (props) => {
+  const [login] = useMutation(loginPlayerMutation);
+
   const router = useRouter();
   const { register, handleSubmit, errors } = useForm();
   const [errorMessage, setErrorMessage] = useState('');
 
   async function onSubmit({ playerName, password }) {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ playerName, password }),
-    });
+    try {
+      await login({
+        variables: {
+          playerName: playerName,
+          password: password,
+        },
+      });
 
-    const { success } = await response.json();
-
-    if (!success) {
-      const statusObj = {
-        401: 'name or password is wrong',
-        500: 'there was a problem with the database',
-      };
-
-      const message = statusObj[response.status];
-
-      setErrorMessage(message ? message : 'unknown error on login');
-    } else {
-      setErrorMessage('');
       router.push(props.redirectDestination);
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error));
     }
   }
 
@@ -48,7 +49,7 @@ const login = (props) => {
       palyerName
       <br />
       <input
-        value="heggart"
+        // value="heggart"
         name="playerName"
         ref={register({ required: true })}
         type="text"
@@ -58,7 +59,7 @@ const login = (props) => {
       password
       <br />
       <input
-        value="123abc123"
+        // value="123abc123"
         name="password"
         ref={register({ required: true })}
         type="password"

@@ -12,13 +12,15 @@ export async function registerPlayer({
   pwHash,
   gameInstance,
 }) {
-  const users = await sql`
+  const user = await sql`
     INSERT INTO players
       (player_name, e_mail, nick_name, pw_hash, game_id)
     VALUES
       (${playerName}, ${email}, ${nickname}, ${pwHash}, ${gameInstance.gameId})
     RETURNING *;
   `;
+
+  return camelcaseKeys(user[0]);
 }
 
 export async function getPlayerByName(playerName) {
