@@ -6,6 +6,23 @@ import Link from 'next/link';
 import { useMutation, gql } from '@apollo/client';
 import { getErrorMessage } from '../lib/error';
 
+const LoginLink = styled.a`
+  color: white;
+  text-decoration: none;
+  margin: 10px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const Form = styled.form`
+  margin: 20px auto;
+  display: grid;
+  justify-items: center;
+`;
+
 const createPlayerMutation = gql`
   mutation createPlayer(
     $playerName: String!
@@ -60,7 +77,7 @@ const register = ({ token }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       palyerName
       <br />
       <input name="playerName" ref={register({ required: true })} type="text" />
@@ -93,9 +110,9 @@ const register = ({ token }) => {
       )}
       <button>register</button>
       <Link href="/login">
-        <a>logIn</a>
+        <LoginLink>logIn</LoginLink>
       </Link>
-    </form>
+    </Form>
   );
 };
 

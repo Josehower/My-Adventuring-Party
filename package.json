@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.2.5",
+    "@apollo/react-ssr": "^4.0.0",
     "apollo-server-micro": "^2.19.0",
     "argon2": "^0.27.0",
     "camelcase-keys": "^6.2.2",

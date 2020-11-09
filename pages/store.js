@@ -1,16 +1,22 @@
+import React from 'react';
+import { initializeApollo } from '../apollo/client';
+import PlayerBag, { bagQuery } from '../components/PlayerBag';
 import { isSessionTokenValid } from '../utils/auth';
 import nextCookies from 'next-cookies';
 import { getGameByToken } from '../utils/account-database';
-import { initializeApollo } from '../apollo/client';
-import PlayerBag, { bagQuery } from '../components/PlayerBag';
+import MariosStore, { getStoreQuerry } from '../components/MariosStore';
+import { getStoreByGameId } from '../utils/game-database';
 
-export default function Home(props) {
+const store = ({ gameId, setPrompt }) => {
   return (
     <div>
-      <PlayerBag gameId={props.gameId} messageSetter={props.setPrompt} />
+      <MariosStore messageSetter={setPrompt} gameId={gameId} />
+      <PlayerBag gameId={gameId} messageSetter={setPrompt} />
     </div>
   );
-}
+};
+
+export default store;
 
 export async function getServerSideProps(context) {
   const apolloClient = initializeApollo(null, context);
@@ -34,9 +40,19 @@ export async function getServerSideProps(context) {
     variables: { gameId: gameId },
   });
 
+  await apolloClient.query({
+    query: getStoreQuerry,
+    variables: { id: gameId },
+  });
+
+  const store = await getStoreByGameId(gameId);
+
+  console.log(apolloClient.cache.extract());
+
   return {
     props: {
       loggedIn,
+      store,
       gameId,
       initialApolloState: apolloClient.cache.extract(),
     },

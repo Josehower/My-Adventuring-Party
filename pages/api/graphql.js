@@ -11,7 +11,7 @@ export const schema = makeExecutableSchema({
 const apolloServer = new ApolloServer({
   schema,
   context(ctx) {
-    return ctx;
+    return { ...ctx, custom: 'heyyyyyyyy' };
   },
 });
 

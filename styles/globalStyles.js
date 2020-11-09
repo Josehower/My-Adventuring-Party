@@ -1,7 +1,12 @@
 import { createGlobalStyle } from 'styled-components';
 
+export const colors = {
+  white: '#eeeeee',
+};
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const GlobalStyle = createGlobalStyle`
+
 /*------------- css resets   ------------------------ */
 /*
 html5doctor.com Reset Stylesheet
@@ -95,6 +100,12 @@ input, select {
 *, *::after, *::before{
 box-sizing: border-box;
 }
+
+body{
+    background: black;
+    color: white;
+}
+
 
 button{
     cursor: pointer;

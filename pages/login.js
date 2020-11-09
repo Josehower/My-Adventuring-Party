@@ -7,6 +7,23 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useMutation, gql } from '@apollo/client';
 
+const RegisterLink = styled.a`
+  color: white;
+  text-decoration: none;
+  margin: 10px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const Form = styled.form`
+  margin: 20px auto;
+  display: grid;
+  justify-items: center;
+`;
+
 const loginPlayerMutation = gql`
   mutation loginPlayer($playerName: String!, $password: String!) {
     loginPlayer(input: { playerName: $playerName, password: $password }) {
@@ -40,12 +57,12 @@ const login = (props) => {
 
       router.push(props.redirectDestination);
     } catch (error) {
-      setErrorMessage(getErrorMessage(error));
+      setErrorMessage(error.message);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       palyerName
       <br />
       <input
@@ -74,9 +91,9 @@ const login = (props) => {
       )}
       <button>LogIn</button>
       <Link href="/register">
-        <a>register</a>
+        <RegisterLink>register</RegisterLink>
       </Link>
-    </form>
+    </Form>
   );
 };
 

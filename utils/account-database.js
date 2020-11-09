@@ -3,7 +3,30 @@ import dotenv from 'dotenv';
 import camelcaseKeys from 'camelcase-keys';
 
 dotenv.config();
-const sql = postgres();
+
+export let sql;
+
+if (process.env.NODE_ENV === 'production') {
+  // Heroku needs SSL connections but
+  // has an "unauthorized" certificate
+  // https://devcenter.heroku.com/changelog-items/852
+  sql = postgres({ ssl: { rejectUnauthorized: false } });
+} else {
+  if (!globalThis.postgresSql) {
+    globalThis.postgresSql = postgres();
+  }
+  sql = globalThis.postgresSql;
+}
+
+// export const sql =
+//   process.env.NODE_ENV === 'production'
+//     ? // Heroku needs SSL connections but
+//       // has an "unauthorized" certificate
+//       // https://devcenter.heroku.com/changelog-items/852
+//       postgres({ ssl: { rejectUnauthorized: false } })
+//     : postgres({
+//         idle_timeout: 5,
+//       });
 
 export async function registerPlayer({
   playerName,
