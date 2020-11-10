@@ -5,7 +5,7 @@ exports.up = async (sql) => {
 		ve_class_base integer NOT NULL,
 		ap_class_base integer NOT NULL,
 		sd_class_base integer NOT NULL,
-		pd_class_base integer NOT NULL,
+		pd_class_base integer NOT NULL
 
 	);`;
 
@@ -15,7 +15,7 @@ exports.up = async (sql) => {
 		ve_class_boost integer NOT NULL,
 		ap_class_boost integer NOT NULL,
 		sd_class_boost integer NOT NULL,
-		pd_class_boost integer NOT NULL,
+		pd_class_boost integer NOT NULL
 
 	);`;
 };

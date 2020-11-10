@@ -3,8 +3,38 @@ import { gql } from 'apollo-server-micro';
 const typeDefs = gql`
   type Query {
     playerMoney: PlayerMoney
-    playerStore(id: Int!): [StoreItem]
-    playerBag(gameId: Int): [bagItem]
+    playerStore: [StoreItem]
+    playerBag: [bagItem]
+    heldenList: [Helden]
+  }
+  type Mutation {
+    createPlayer(input: PlayerInput!): Player!
+    loginPlayer(input: LoginInput!): Player!
+    hitTheBarrel: Message
+    buyItem(itemId: Int!, withSoulStones: Boolean): Message
+    createHelden(name: String!, className: String!): Message
+  }
+  type Helden {
+    id: Int
+    gameId: Int
+    name: String
+    lvl: Int
+    exs: Int
+    sa: Int
+    partySlot: Int
+    class: HeldenClass
+    stats: HeldenStats
+  }
+  type HeldenClass {
+    className: String
+    classId: Int
+    classImg: String
+  }
+  type HeldenStats {
+    ve: Int
+    ap: Int
+    sd: Int
+    pd: Int
   }
   type StoreItem {
     name: String
@@ -24,7 +54,7 @@ const typeDefs = gql`
     nickName: String
     gold: Int
     soulStones: Int
-    lastHitJson: String
+    lastHit: String
   }
   type Player {
     playerId: Int
@@ -46,12 +76,6 @@ const typeDefs = gql`
   }
   type Message {
     message: String
-  }
-  type Mutation {
-    createPlayer(input: PlayerInput!): Player!
-    loginPlayer(input: LoginInput!): Player!
-    hitTheBarrel: Message
-    buyItem(itemId: Int!, gameId: Int!, withSoulStones: Boolean): Message
   }
 `;
 

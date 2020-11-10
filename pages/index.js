@@ -31,7 +31,6 @@ export async function getServerSideProps(context) {
 
   await apolloClient.query({
     query: bagQuery,
-    variables: { gameId: gameId },
   });
 
   return {

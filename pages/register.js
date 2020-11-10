@@ -78,7 +78,7 @@ const register = ({ token }) => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      palyerName
+      playerName
       <br />
       <input name="playerName" ref={register({ required: true })} type="text" />
       {errors.playerName && <Error>---{'>'} ups, this is required</Error>}

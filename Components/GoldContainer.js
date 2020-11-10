@@ -30,7 +30,7 @@ export const moneyQuery = gql`
   query playerMoney {
     playerMoney {
       nickName
-      lastHitJson
+      lastHit
       gold
       soulStones
     }
@@ -51,8 +51,8 @@ const GoldContainer = ({ setPrompt = console.log, isPlayerLogged }) => {
   const [barrelAmount, setBarrelAmount] = useState(0);
   const [lastBarrelHit, setLastBarrelHit] = useState(+Date.now());
 
-  if (money && money?.playerMoney.lastHitJson !== lastBarrelHit) {
-    setLastBarrelHit(money?.playerMoney.lastHitJson);
+  if (money && money?.playerMoney.lastHit !== lastBarrelHit) {
+    setLastBarrelHit(money?.playerMoney.lastHit);
   }
 
   function updateBarrel() {

@@ -1,4 +1,5 @@
-import { getSessionByToken } from './account-database';
+import { getGameByToken, getSessionByToken } from './account-database';
+import nextCookies from 'next-cookies';
 
 export async function isSessionTokenValid(token) {
   if (typeof token === 'undefined') {
@@ -16,4 +17,17 @@ export async function isSessionTokenValid(token) {
   }
 
   return true;
+}
+
+export async function isThisCallAllowed(context) {
+  const { session: token } = nextCookies(context);
+  const isValid = await isSessionTokenValid(token);
+  if (!isValid) return false;
+  return true;
+}
+
+export async function getGameIdFromContext(ctx) {
+  const { session: token } = nextCookies(ctx);
+  const { gameId } = await getGameByToken(token);
+  return gameId;
 }

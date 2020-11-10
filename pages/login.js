@@ -63,7 +63,7 @@ const login = (props) => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      palyerName
+      playerName
       <br />
       <input
         // value="heggart"

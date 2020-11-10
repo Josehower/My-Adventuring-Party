@@ -73,16 +73,16 @@ const Buy = styled.button`
 `;
 
 const buyItemMutation = gql`
-  mutation buyItem($itemId: Int!, $gameId: Int!, $withSoulStones: Boolean) {
-    buyItem(itemId: $itemId, gameId: $gameId, withSoulStones: $withSoulStones) {
+  mutation buyItem($itemId: Int!, $withSoulStones: Boolean) {
+    buyItem(itemId: $itemId, withSoulStones: $withSoulStones) {
       message
     }
   }
 `;
 
 export const getStoreQuerry = gql`
-  query playerStore($id: Int!) {
-    playerStore(id: $id) {
+  query playerStore {
+    playerStore {
       name
       price
       isLocked
@@ -93,19 +93,15 @@ export const getStoreQuerry = gql`
   }
 `;
 
-const MariosStore = ({ messageSetter, gameId = 0 }) => {
+const MariosStore = ({ messageSetter }) => {
   const { data: playerStoreData, refetch: storeRefetch } = useQuery(
     getStoreQuerry,
-    {
-      variables: { id: gameId },
-    },
   );
 
   const [buyItem] = useMutation(buyItemMutation, {
     refetchQueries: [
       {
         query: bagQuery,
-        variables: { gameId: gameId },
       },
     ],
   });
@@ -124,11 +120,10 @@ const MariosStore = ({ messageSetter, gameId = 0 }) => {
     }
   }, [playerStoreData]);
 
-  async function buyItemHandler(itemId, gameId, withSoulStones = false) {
+  async function buyItemHandler(itemId, withSoulStones = false) {
     const { data } = await buyItem({
       variables: {
         itemId: itemId,
-        gameId: gameId,
         withSoulStones: withSoulStones,
       },
     });
@@ -161,7 +156,7 @@ const MariosStore = ({ messageSetter, gameId = 0 }) => {
                 {item.isLocked ? (
                   <Locked onClick={() => storeRefetch()}>Locked</Locked>
                 ) : (
-                  <Buy onClick={() => buyItemHandler(item.itemId, item.gameId)}>
+                  <Buy onClick={() => buyItemHandler(item.itemId)}>
                     buy {item.price}
                   </Buy>
                 )}

@@ -3,15 +3,13 @@ import { initializeApollo } from '../apollo/client';
 import PlayerBag, { bagQuery } from '../components/PlayerBag';
 import { isSessionTokenValid } from '../utils/auth';
 import nextCookies from 'next-cookies';
-import { getGameByToken } from '../utils/account-database';
 import MariosStore, { getStoreQuerry } from '../components/MariosStore';
-import { getStoreByGameId } from '../utils/game-database';
 
-const store = ({ gameId, setPrompt }) => {
+const store = ({ setPrompt }) => {
   return (
     <div>
-      <MariosStore messageSetter={setPrompt} gameId={gameId} />
-      <PlayerBag gameId={gameId} messageSetter={setPrompt} />
+      <MariosStore messageSetter={setPrompt} />
+      <PlayerBag messageSetter={setPrompt} />
     </div>
   );
 };
@@ -32,28 +30,18 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  const gameInstance = await getGameByToken(token);
-  const gameId = gameInstance.gameId;
 
   await apolloClient.query({
     query: bagQuery,
-    variables: { gameId: gameId },
   });
 
   await apolloClient.query({
     query: getStoreQuerry,
-    variables: { id: gameId },
   });
-
-  const store = await getStoreByGameId(gameId);
-
-  console.log(apolloClient.cache.extract());
 
   return {
     props: {
       loggedIn,
-      store,
-      gameId,
       initialApolloState: apolloClient.cache.extract(),
     },
   };

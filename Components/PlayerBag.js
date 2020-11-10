@@ -61,8 +61,8 @@ const Qty = styled.div`
 `;
 
 export const bagQuery = gql`
-  query playerBag($gameId: Int) {
-    playerBag(gameId: $gameId) {
+  query playerBag {
+    playerBag {
       name
       itemId
       description
@@ -71,10 +71,8 @@ export const bagQuery = gql`
   }
 `;
 
-const PlayerBag = ({ messageSetter = console.log, gameId = 0 }) => {
-  const { data, loading, error } = useQuery(bagQuery, {
-    variables: { gameId: gameId },
-  });
+const PlayerBag = ({ messageSetter = console.log }) => {
+  const { data, loading, error } = useQuery(bagQuery);
 
   if (loading) return 'loading...';
   if (error) return `${error}`;
