@@ -13,6 +13,13 @@ const typeDefs = gql`
     hitTheBarrel: Message
     buyItem(itemId: Int!, withSoulStones: Boolean): Message
     createHelden(name: String!, className: String!): Message
+    deleteHelden(heldenId: Int!): Message
+    heldenToParty(heldenId: Int!, position: Int!): Message
+    heldenToBench(heldenId: Int!): Message
+    itemVeUpgrade(heldenId: Int!, amount: Int): Message
+    itemApUpgrade(heldenId: Int!, amount: Int): Message
+    itemPdUpgrade(heldenId: Int!, amount: Int): Message
+    itemSdUpgrade(heldenId: Int!, amount: Int): Message
   }
   type Helden {
     id: Int

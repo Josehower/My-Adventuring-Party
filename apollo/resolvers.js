@@ -8,7 +8,17 @@ import {
   buyItemByGameId,
   getPlayerBagByGameId,
 } from '../utils/game-database';
-import { createHelden, getHeldenListByGameId } from '../utils/helden-database';
+import {
+  createHelden,
+  deleteHeldenById,
+  getHeldenListByGameId,
+  heldenToParty,
+  heldenToBench,
+  upgradeHeldenVeById,
+  upgradeHeldenApById,
+  upgradeHeldenPdById,
+  upgradeHeldenSdById,
+} from '../utils/helden-database';
 
 const resolvers = {
   Query: {
@@ -52,6 +62,58 @@ const resolvers = {
   },
 
   Mutation: {
+    async itemVeUpgrade(p, args, context) {
+      const isAllowed = await isThisCallAllowed(context);
+      if (isAllowed) {
+        const message = await upgradeHeldenVeById(args.heldenId, args.amount);
+        return message;
+      }
+      return { message: 'ups... this is not allowed!' };
+    },
+    async itemApUpgrade(p, args, context) {
+      const isAllowed = await isThisCallAllowed(context);
+      if (isAllowed) {
+        const message = await upgradeHeldenApById(args.heldenId, args.amount);
+        return message;
+      }
+      return { message: 'ups... this is not allowed!' };
+    },
+    async itemPdUpgrade(p, args, context) {
+      const isAllowed = await isThisCallAllowed(context);
+      if (isAllowed) {
+        const message = await upgradeHeldenPdById(args.heldenId, args.amount);
+        return message;
+      }
+      return { message: 'ups... this is not allowed!' };
+    },
+    async itemSdUpgrade(p, args, context) {
+      const isAllowed = await isThisCallAllowed(context);
+      if (isAllowed) {
+        const message = await upgradeHeldenSdById(args.heldenId, args.amount);
+        return message;
+      }
+      return { message: 'ups... this is not allowed!' };
+    },
+
+    async heldenToBench(p, args) {
+      const message = await heldenToBench(args.heldenId);
+      return message;
+    },
+
+    async heldenToParty(p, args) {
+      const message = await heldenToParty(args.heldenId, args.position);
+      return message;
+    },
+
+    async deleteHelden(p, args, context) {
+      const isAllowed = await isThisCallAllowed(context);
+      if (isAllowed) {
+        const message = deleteHeldenById(args.heldenId);
+        return message;
+      }
+      return { message: 'ups... this is not allowed!' };
+    },
+
     async createHelden(p, args, context) {
       const gameId = await getGameIdFromContext(context);
       const isAllowed = await isThisCallAllowed(context);

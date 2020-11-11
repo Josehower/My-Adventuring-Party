@@ -82,17 +82,17 @@ after a leveling up the next changes will happen:
 1. on lvl 3 / 7 / 10 the HELDEN will get a new SA slot AND A VE BOOST
 1. after lvl 7 the HELDEN can be transform into SOUL STONES (NON a feature for UPLeveled final)
 
-|lvl  | skill stats increment   | total SA slots | can be stoned? LOL|
-|:----|:-----------------------:|:---------------|:-----------------:| 
-|2    | 5%    + class increment | 2              | NO                |
-|3    | 10% + 5%VE + class incr | 3              | NO                |
-|4    | 10%   + class increment | 3              | NO                |
-|5    | 10%   + class increment | 3              | NO                |
-|6    | 10%   + class increment | 3              | NO                |
-|7    | 15% + 10%VE + class inc | 4              | YES               |
-|8    | 15%   + class increment | 4              | YES               |
-|9    | 15%   + class increment | 4              | YES               |
-|10   | 20% + 40%VE + class inc | 5              | YES but... REALLY?|
+|lvl  | skill stats increment            | total SA slots | can be stoned? LOL|
+|:----|:--------------------------------:|:---------------|:-----------------:| 
+|2    | 5%(+ 1def)     + class increment | 2              | NO                |
+|3    | 10%(+ 1def)  + 5%VE + class incr | 3              | NO                |
+|4    | 10%(+ 1def)    + class increment | 3              | NO                |
+|5    | 10%(+ 1def)    + class increment | 3              | NO                |
+|6    | 10%(+ 1def)    + class increment | 3              | NO                |
+|7    | 15%(+ 1def)  + 10%VE + class inc | 4              | YES               |
+|8    | 15%(+ 1def)    + class increment | 4              | YES               |
+|9    | 15%(+ 1def)    + class increment | 4              | YES               |
+|10   | 20%(+ 2def)  + 20%VE + class inc | 5              | YES but... REALLY?|
 
 
 ### Stats <a id="stats"></a>
