@@ -4,8 +4,10 @@ const typeDefs = gql`
   type Query {
     playerMoney: PlayerMoney
     playerStore: [StoreItem]
-    playerBag: [bagItem]
+    playerBag: [BagItem]
     heldenList: [Helden]
+    expeditionList: [Expedition]
+    expeditionTimeLeft(heldenId: Int!): String
   }
   type Mutation {
     createPlayer(input: PlayerInput!): Player!
@@ -20,6 +22,14 @@ const typeDefs = gql`
     itemApUpgrade(heldenId: Int!, amount: Int): Message
     itemPdUpgrade(heldenId: Int!, amount: Int): Message
     itemSdUpgrade(heldenId: Int!, amount: Int): Message
+    createExpedition(heldenId: Int!): Message
+  }
+  type Expedition {
+    gameId: Int
+    heldenId: Int
+    name: String
+    lvlLevel: Int
+    expeditionStartDate: String
   }
   type Helden {
     id: Int
@@ -51,7 +61,7 @@ const typeDefs = gql`
     gameId: Int
     itemId: Int
   }
-  type bagItem {
+  type BagItem {
     itemId: Int
     name: String
     qty: Int

@@ -263,12 +263,12 @@ go for the next one.
 for DP and SP, the system first check which stat will be incremented, then check if the rare increment will occur, if the check fail go to the next one and so on.
 
 
-|Stat NAME  | Warrior         | Mage  (AP)      | Gunner    (AP) |Healer(SD and PD)|
-|:----------|:---------------:|:----------------|:--------------:|----------------:| 
-|VE         | 5% / 8% / 10%   | 1% / 5% / 8%    | 1% / 5% / 8%   | 0% / 2% / 5%    |
-|AP         | 1% / 5% / 8%    | 5% / 8% / 10%   | 5% / 8% / 10%  | 5% / 5% / 10%   |
-|SD         | 0  / 1  / 1     | 0  / 1  / 1     | 0  / 0  / 1    | 1  / 1  / 2     |
-|PD         | 0  / 1  / 1     | 0  / 0  / 1     | 0  / 1  / 1    | 1  / 1  / 2     |
+|Stat NAME  | Warrior (VE)       | Mage  (AP)         | Gunner       (AP) |Healer(low AP-SD&PD)  |
+|:----------|:------------------:|:-------------------|:-----------------:|---------------------:| 
+|VE         | 5%/5% / 8% / 10%   | 1% / 5% / 8%       | 1% / 5% / 8%      | 0% / 2% / 5%         |
+|AP         | 1% / 5% / 8%       | 5%/5% / 8% / 10%   | 5%/5% / 8% / 10%  | 3%/5% / 5% / 10%     |
+|SD         | 0  / 1  / 1        | 0  / 1  / 1        | 0  / 0  / 1       | 1/1  / 1  / 2        |
+|PD         | 0  / 1  / 1        | 0  / 0  / 1        | 0  / 1  / 1       | 1/ 1 / 1  / 2        |
 
 
 Movement in the game

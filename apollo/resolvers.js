@@ -2,6 +2,11 @@ import { login } from '../lib/login';
 import { createNewPlayer } from '../lib/player';
 import { isThisCallAllowed, getGameIdFromContext } from '../utils/auth';
 import {
+  createExpeditionByHeldenId,
+  getGameExpeditionList,
+  getHeldenExpeditionTimeLeft,
+} from '../utils/expedition-database';
+import {
   getPlayerMoneyById,
   getStoreByGameId,
   hitTheBarrelByGameId,
@@ -22,6 +27,25 @@ import {
 
 const resolvers = {
   Query: {
+    async expeditionTimeLeft(p, args, context) {
+      const isAllowed = await isThisCallAllowed(context);
+      if (isAllowed) {
+        const timeLeft = await getHeldenExpeditionTimeLeft(args.heldenId);
+        // console.log(expeditionList);
+        return timeLeft;
+      }
+      return;
+    },
+    async expeditionList(p, args, context) {
+      const gameId = await getGameIdFromContext(context);
+      const isAllowed = await isThisCallAllowed(context);
+      if (isAllowed) {
+        const expeditionList = await getGameExpeditionList(gameId);
+        return expeditionList;
+      }
+      return;
+    },
+
     async heldenList(p, args, context) {
       const gameId = await getGameIdFromContext(context);
       const isAllowed = await isThisCallAllowed(context);
@@ -62,6 +86,15 @@ const resolvers = {
   },
 
   Mutation: {
+    async createExpedition(p, args, context) {
+      const isAllowed = await isThisCallAllowed(context);
+      if (isAllowed) {
+        const message = await createExpeditionByHeldenId(args.heldenId);
+        return message;
+      }
+      return { message: 'ups... this is not allowed!' };
+    },
+
     async itemVeUpgrade(p, args, context) {
       const isAllowed = await isThisCallAllowed(context);
       if (isAllowed) {

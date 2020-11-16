@@ -135,7 +135,7 @@ const heldenToPartyMutation = gql`
   }
 `;
 
-const heldenListQuery = gql`
+export const heldenListQuery = gql`
   query heldenList {
     heldenList {
       name
@@ -395,7 +395,11 @@ const HeldenManager = ({ setPrompt }) => {
         <br />
         Class
         <br />
-        <select name="className" id="cars" ref={register({ required: true })}>
+        <select
+          name="className"
+          id="classes"
+          ref={register({ required: true })}
+        >
           <option value="Warrior">Warrior</option>
           <option value="Healer">Healer</option>
           <option value="Gunner">Gunner</option>

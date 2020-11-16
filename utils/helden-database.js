@@ -4,6 +4,20 @@ import { sql } from './account-database';
 
 dotenv.config();
 
+export async function getGameByHeldenId(HeldenId) {
+  const game = await sql`
+SELECT g.*
+  FROM
+  game_instance as g,
+  helden as h
+  WHERE
+  g.game_id = h.game_id
+  AND
+  h.helden_id = ${HeldenId};
+`;
+  return camelcaseKeys(game);
+}
+
 async function getHeldenById(heldenId) {
   const [helden] = await sql`
   SELECT * FROM helden
@@ -228,14 +242,7 @@ export async function upgradeHeldenPdById(heldenId, amount = 4) {
   FROM helden
   WHERE helden_id = ${heldenId};`;
 
-  const [
-    {
-      pd_physical_defense,
-      exs_experience_shards,
-      lvl_level,
-      sa_special_actions,
-    },
-  ] = await sql`
+  const [{ pd_physical_defense, exs_experience_shards, lvl_level }] = await sql`
   SELECT pd_physical_defense , exs_experience_shards, lvl_level, sa_special_actions  FROM helden_stats_set
     WHERE stats_id = ${heldenStatsId};`;
 
@@ -279,12 +286,7 @@ export async function upgradeHeldenSdById(heldenId, amount = 4) {
   WHERE helden_id = ${heldenId};`;
 
   const [
-    {
-      sd_supernatural_defense,
-      exs_experience_shards,
-      lvl_level,
-      sa_special_actions,
-    },
+    { sd_supernatural_defense, exs_experience_shards, lvl_level },
   ] = await sql`
   SELECT sd_supernatural_defense , exs_experience_shards, lvl_level, sa_special_actions  FROM helden_stats_set
     WHERE stats_id = ${heldenStatsId};`;
