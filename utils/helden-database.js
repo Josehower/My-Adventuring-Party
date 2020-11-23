@@ -389,6 +389,5 @@ export async function levelUp(heldenId) {
     sa_special_actions= ${newSa}
   WHERE stats_id  = ${heldenId} returning *;`;
 
-  console.log(response);
   return;
 }

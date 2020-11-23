@@ -158,9 +158,9 @@ On the game each class show the especiality if the HELDEN, each class have a uni
 
     - Unique conditions: This is the only Class that can be on hte first lane position (see Combat)
 
-    - Special Hability: shield punish
+    - Special Hability: body onslaught
       cost: 1 Special Action
-      effect: 1.5 times ap damage to the target (melee)
+      effect: 150% ap damage to the target (melee)
 
 
   - Gunner:
@@ -174,7 +174,7 @@ On the game each class show the especiality if the HELDEN, each class have a uni
 
     - Special Hability: accurate shot
       cost: 1 Special Action
-      effect: 2 times ap physical damage to the target (range)
+      effect: 200% ap physical damage to the target (range)
 
   - Mage:
 
@@ -187,7 +187,7 @@ On the game each class show the especiality if the HELDEN, each class have a uni
 
     - Special Hability: arcane scourge
       cost: 1 Special Action
-      effect: 2 times ap supernatural damage to the target (range)
+      effect: 200% ap supernatural damage to the target (range)
 
   - Healer:
 
@@ -200,7 +200,7 @@ On the game each class show the especiality if the HELDEN, each class have a uni
 
     - Special Hability: supernatural healing
       cost: 1 Special Action
-      effect: 2.5 times ap healing
+      effect: 250% times ap healing
 
 
 #### Base Stats by Class
@@ -321,7 +321,7 @@ post: only Tactical Actions can be performed
 Each of this steps are resolve in order, first tactical actions that where targeted as pre, will be performed, then the damage actions
 and last all the post actions (if the target of an action is unconcious at the moment of the post action resolution, the action will be skipped).
 
-- pre and post: when a player is declaring actions if the action is a tactical action he or she have to declare if wanted to resolve pre or post damage.
+- pre and post: when a player is declaring actions if the action is a tactical or object action he or she have to declare if wanted to resolve pre or post damage.
 
 - damage: all the damage will be applied at the same time, that means that even if a character die as result of the damage, he will cause damage with his attack.
 

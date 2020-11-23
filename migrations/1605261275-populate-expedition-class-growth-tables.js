@@ -197,6 +197,10 @@ exports.up = async (sql) => {
 
 exports.down = async (sql) => {
   await sql`
+  ALTER TABLE helden_class
+  DROP COLUMN expedition_growth_id;
+  `;
+  await sql`
   DELETE FROM pd_growth_set;
   `;
   await sql`
@@ -210,9 +214,5 @@ exports.down = async (sql) => {
   `;
   await sql`
   DELETE FROM  expedition_class_growth;
-  `;
-  await sql`
-  ALTER TABLE helden_class
-  DROP COLUMN expedition_growth_id;
   `;
 };

@@ -48,5 +48,5 @@ exports.up = async (sql) => {
 
 exports.down = async (sql) => {
   await sql`
-	DROP TABLE IF EXISTS pd_growth_set, sd_growth_set, ap_growth_set, ve_growth_set, expedition_class_growth`;
+	DROP TABLE IF EXISTS pd_growth_set, sd_growth_set, ap_growth_set, ve_growth_set, expedition_class_growth;`;
 };
