@@ -9,6 +9,7 @@ const typeDefs = gql`
     expeditionList: [Expedition]
     expeditionTimeLeft(heldenId: Int!): String
   }
+
   type Mutation {
     createPlayer(input: PlayerInput!): Player!
     loginPlayer(input: LoginInput!): Player!
@@ -23,7 +24,91 @@ const typeDefs = gql`
     itemPdUpgrade(heldenId: Int!, amount: Int): Message
     itemSdUpgrade(heldenId: Int!, amount: Int): Message
     createExpedition(heldenId: Int!): Message
+    updateCombat(script: TurnScript): CombatState
+    initCombat: CombatState
+    deleteCombat: Message
   }
+
+  input TurnScript {
+    enemyTeam: [CreaturePerformedAction]
+    playerTeam: [HeldenPerformedAction]
+  }
+
+  input CreaturePerformedAction {
+    actionId: Int
+    creatureInstanceId: Int
+    target: Int
+  }
+  input HeldenPerformedAction {
+    actionId: Int
+    heldenInstanceId: Int
+    target: Int
+  }
+
+  type CombatState {
+    combatInstance: CombatInstance
+    playerTeam: [HeldenInstance]
+    enemyTeam: [CreatureInstance]
+  }
+
+  type CombatInstance {
+    combatId: Int
+    actualTurn: Int
+    gameId: Int
+  }
+
+  type CreatureInstance {
+    creatureInstanceId: Int
+    creatureId: Int
+    combatId: Int
+    saAvaliable: Int
+    instanceVe: Int
+    slotPosition: Int
+    name: String
+    ap: Int
+    sd: Int
+    pd: Int
+    type: CreatureType
+    actions: [Action]
+  }
+
+  type HeldenInstance {
+    heldenInstanceId: Int
+    heldenId: Int
+    combatId: Int
+    saAvaliable: Int
+    instanceVe: Int
+    ap: Int
+    sd: Int
+    pd: Int
+    name: String
+    class: ClassType
+    slotPosition: Int
+    actions: [Action]
+  }
+
+  type ClassType {
+    classId: Int
+    className: String
+    classImg: String
+  }
+
+  type CreatureType {
+    typeId: Int
+    typeImage: String
+    typeName: String
+  }
+
+  type Action {
+    creatureId: Int
+    heldenId: Int
+    actionId: Int
+    name: String
+    desc: String
+    target: String
+    speed: String
+  }
+
   type Expedition {
     gameId: Int
     heldenId: Int
@@ -31,6 +116,7 @@ const typeDefs = gql`
     lvlLevel: Int
     expeditionStartDate: String
   }
+
   type Helden {
     id: Int
     gameId: Int
@@ -42,11 +128,13 @@ const typeDefs = gql`
     class: HeldenClass
     stats: HeldenStats
   }
+
   type HeldenClass {
     className: String
     classId: Int
     classImg: String
   }
+
   type HeldenStats {
     ve: Int
     ap: Int

@@ -2,6 +2,11 @@ import { login } from '../lib/login';
 import { createNewPlayer } from '../lib/player';
 import { isThisCallAllowed, getGameIdFromContext } from '../utils/auth';
 import {
+  deleteCombatInstance,
+  initializeCombat,
+  updateCombat,
+} from '../utils/Combat-database';
+import {
   createExpeditionByHeldenId,
   getGameExpeditionList,
   getHeldenExpeditionTimeLeft,
@@ -86,6 +91,39 @@ const resolvers = {
   },
 
   Mutation: {
+    async updateCombat(p, args, context) {
+      const isAllowed = await isThisCallAllowed(context);
+      const gameId = await getGameIdFromContext(context);
+
+      if (isAllowed) {
+        const combat = await updateCombat(args.script, gameId);
+        return combat;
+      }
+      return { message: 'ups... this is not allowed!' };
+    },
+
+    async initCombat(p, args, context) {
+      const isAllowed = await isThisCallAllowed(context);
+      const gameId = await getGameIdFromContext(context);
+
+      if (isAllowed) {
+        const combat = await initializeCombat(gameId);
+        console.log(combat);
+        return combat;
+      }
+      return { message: 'ups... this is not allowed!' };
+    },
+    async deleteCombat(p, args, context) {
+      const isAllowed = await isThisCallAllowed(context);
+      const gameId = await getGameIdFromContext(context);
+
+      if (isAllowed) {
+        const message = await deleteCombatInstance(gameId);
+        return message;
+      }
+      return { message: 'ups... this is not allowed!' };
+    },
+
     async createExpedition(p, args, context) {
       const isAllowed = await isThisCallAllowed(context);
       if (isAllowed) {

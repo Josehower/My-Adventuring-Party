@@ -48,7 +48,6 @@ exports.up = async (sql) => {
   });
 
   const junctionObj = await Promise.all(promises);
-  console.log(await classActionsWithBasic);
 
   const junctionInfo = await sql`
 	INSERT INTO creature_actions_set ${sql(

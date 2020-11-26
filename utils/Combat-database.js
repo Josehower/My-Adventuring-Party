@@ -3,6 +3,7 @@ import camelcaseKeys from 'camelcase-keys';
 import { sql } from './account-database';
 import { getHeldenListByGameId } from './helden-database';
 import { testEncounter } from './encounterList';
+import { throwServerError } from '@apollo/client';
 
 dotenv.config();
 
@@ -100,13 +101,17 @@ async function getCombatInstace(gameId) {
 
 export async function deleteCombatInstance(gameId) {
   await sql`DELETE FROM combat_instance WHERE game_id = ${gameId}`;
+
+  return { message: `combat was successfully deleted from game # ${gameId}` };
 }
 
-async function getHeldenInstances(combatId, partyList) {
+async function getHeldenInstances(combatId, partyList = null) {
   let heldenInstances = await sql`
   SELECT * FROM helden_instance WHERE combat_id = ${combatId};
   `;
   if (!heldenInstances.length) {
+    if (!partyList) return;
+
     const heldenInstancesObj = partyList.map((helden) => {
       return {
         helden_id: helden.id,
@@ -182,6 +187,7 @@ async function getEnemyInstances(combatId) {
   }
 
   return enemyInstances
+    .sort((a, b) => a.slot_position - b.slot_position)
     .map((enemyInstance) => {
       const realEnemyRef = instanceObjArr.find(
         (enemy) => enemy.slot_position === enemyInstance.slot_position,
@@ -209,22 +215,24 @@ async function getHeldenActionsById(heldenId) {
     action.combat_action_id as action_id,
     action.action_name as name,
     action.action_desc as desc,
+    action.effect_ref as effect,
     target.target_keyword_name as target,
+    type.action_type_name as type,
     speed.speed_name as speed
   FROM
     helden,
     class_actions_set as junction,
     combat_action as action,
     target_keyword as target,
-    action_type as action_type,
+    action_type as type,
     action_speed as speed
   WHERE
     helden.helden_id = ${heldenId} AND
     helden.class_id = junction.class_id AND
     junction.combat_action_id = action.combat_action_id AND
     action.target_id = target.target_id AND
-    action.action_type_id = action_type.action_type_id AND
-    action_type.action_speed_id = speed.action_speed_id
+    action.action_type_id = type.action_type_id AND
+    type.action_speed_id = speed.action_speed_id
   `;
 }
 
@@ -235,21 +243,376 @@ async function getCreatureActionsById(creatureId) {
     action.combat_action_id as action_id,
     action.action_name as name,
     action.action_desc as desc,
+    action.effect_ref as effect,
     target.target_keyword_name as target,
+    type.action_type_name as type,
     speed.speed_name as speed
   FROM
     enemy_creatures as creature,
     creature_actions_set as junction,
     combat_action as action,
     target_keyword as target,
-    action_type as action_type,
+    action_type as type,
     action_speed as speed
   WHERE
     creature.creature_id  = ${creatureId} AND
     creature.creature_type_id = junction.creature_type_id AND
     junction.combat_action_id = action.combat_action_id AND
     action.target_id = target.target_id AND
-    action.action_type_id = action_type.action_type_id AND
-    action_type.action_speed_id = speed.action_speed_id
+    action.action_type_id = type.action_type_id AND
+    type.action_speed_id = speed.action_speed_id
   `;
+}
+
+export async function updateCombat(script, gameId) {
+  const combatInstance = await getCombatInstace(gameId);
+
+  const enemyTeamActions = script.enemyTeam.filter((action) => action);
+  const enemyLoopAmount = enemyTeamActions.length;
+
+  const playerTeamActions = script.playerTeam.filter((action) => action);
+  const playerLoopAmount = playerTeamActions.length;
+
+  if (combatInstance.actualTurn % 2) {
+    console.log(combatInstance.actualTurn, 'first action creatures');
+    for (let i = 0; i < enemyLoopAmount; i++) {
+      const currentAction = enemyTeamActions[i];
+      await enemyActionResolver(currentAction);
+    }
+
+    for (let i = 0; i < playerLoopAmount; i++) {
+      const currentAction = playerTeamActions[i];
+      await heldenActionResolver(currentAction);
+    }
+  } else {
+    console.log(combatInstance.actualTurn, 'first action helden');
+    for (let i = 0; i < playerLoopAmount; i++) {
+      const currentAction = playerTeamActions[i];
+      await heldenActionResolver(currentAction);
+    }
+
+    for (let i = 0; i < enemyLoopAmount; i++) {
+      const currentAction = enemyTeamActions[i];
+      await enemyActionResolver(currentAction);
+    }
+  }
+
+  await sql`
+  UPDATE
+    combat_instance
+  SET
+    actual_turn = ${combatInstance.actualTurn + 1}
+  WHERE
+    game_id = ${gameId}
+  `;
+
+  const newCombatState = await initializeCombat(gameId);
+
+  newCombatState.playerTeam.forEach((helden) => {
+    if (helden.saAvaliable === 0) {
+      helden.actions = helden.actions.filter(
+        (action) => action.type === 'basic',
+      );
+      return helden;
+    }
+
+    return helden;
+  });
+
+  newCombatState.enemyTeam.forEach((creature) => {
+    if (creature.saAvaliable === 0) {
+      creature.actions = creature.actions.filter(
+        (action) => action.type === 'basic',
+      );
+      return creature;
+    }
+
+    return creature;
+  });
+
+  return newCombatState;
+}
+
+async function heldenActionResolver({ actionId, heldenInstanceId, target }) {
+  const {
+    heldenInstanceId: instanceId,
+    heldenId,
+    combatId,
+    saAvaliable,
+    instanceVe,
+    ap: performerAp,
+  } = await getSingleHeldenInstance(heldenInstanceId);
+
+  // console.log(await getSingleHeldenInstance(heldenInstanceId));
+
+  let targetInstance;
+
+  const actionPerformed = (await getHeldenActionsById(heldenId)).find(
+    (action) => action.action_id === actionId,
+  );
+
+  if (!actionPerformed) {
+    throw new Error('this helden action is invalid');
+  }
+
+  if (actionPerformed.target === 'enemy') {
+    targetInstance = await getSingleEnemyInstance(target);
+    const damageNature = await getHeldenDamageNatureBy(heldenId);
+
+    //check if the action is dodged
+    let isDodged;
+    if (damageNature === 'Supernatural') {
+      isDodged = isActionDodged(targetInstance.sd);
+    } else {
+      isDodged = isActionDodged(targetInstance.pd);
+    }
+
+    // check if there are enough SA and calculate the new SA
+    if (actionPerformed.type === 'special attack') {
+      if (saAvaliable === 0) return;
+
+      await sql`
+      UPDATE
+        helden_instance
+      SET
+        sa_Avaliable = ${saAvaliable - 1}
+      WHERE
+        helden_instance_id = ${heldenInstanceId}
+      RETURNING *;
+      `;
+    }
+
+    if (isDodged) {
+      console.log('action dodged');
+      return 'the action was dodged';
+    }
+
+    //if damaga is dealt, calculate the damafe
+    const damage = performerAp * (actionPerformed.effect / 100);
+    let newVe = targetInstance.instanceVe - damage;
+    //check values below 0
+    newVe = newVe < 0 ? 0 : newVe;
+
+    // update VE on target Instance
+    await sql`
+    UPDATE
+      creature_instance
+    SET
+      instance_ve = ${newVe}
+    WHERE
+      creature_instance_id = ${target}
+    RETURNING *;
+    `;
+  } else {
+    targetInstance = await getSingleHeldenInstance(target);
+
+    if (actionPerformed.type === 'healing') {
+      if (saAvaliable === 0) return;
+
+      await sql`
+      UPDATE
+        helden_instance
+      SET
+        sa_Avaliable = ${saAvaliable - 1}
+      WHERE
+        helden_instance_id = ${heldenInstanceId}
+      RETURNING *;
+      `;
+    }
+
+    //calculate the new VE
+    const healing = performerAp * (actionPerformed.effect / 100);
+    let newVe = targetInstance.instanceVe + healing;
+    //a helden cannot have more ve than his initial ve
+    newVe = newVe > targetInstance.ve ? targetInstance.ve : newVe;
+
+    await sql`
+    UPDATE
+      helden_instance
+    SET
+      instance_ve = ${newVe}
+    WHERE
+      helden_instance_id = ${target}
+    RETURNING *;
+    `;
+  }
+}
+
+async function enemyActionResolver({ actionId, creatureInstanceId, target }) {
+  const {
+    creatureId,
+    combatId,
+    saAvaliable,
+    instanceVe,
+    slotPosition,
+    ve: maxVe,
+    ap: performerAp,
+    sd,
+    pd,
+  } = await getSingleEnemyInstance(creatureInstanceId);
+
+  let targetInstance;
+
+  const actionPerformed = (await getCreatureActionsById(creatureId)).find(
+    (action) => action.action_id === actionId,
+  );
+
+  if (!actionPerformed) {
+    throw new Error('this creature action is invalid');
+  }
+
+  if (actionPerformed.target === 'enemy') {
+    targetInstance = await getSingleHeldenInstance(target);
+    const damageNature = await getCreatureDamageNatureBy(creatureId);
+
+    //check if the action is dodged
+    let isDodged;
+    if (damageNature === 'Supernatural') {
+      isDodged = isActionDodged(targetInstance.sd);
+    } else {
+      isDodged = isActionDodged(targetInstance.pd);
+    }
+
+    // check if there are enough SA and calculate the new SA
+    if (actionPerformed.type === 'special attack') {
+      if (saAvaliable === 0) return;
+
+      await sql`
+      UPDATE
+        creature_instance
+      SET
+        sa_Avaliable = ${saAvaliable - 1}
+      WHERE
+        creature_instance_id = ${creatureInstanceId}
+      RETURNING *;
+      `;
+    }
+
+    if (isDodged) {
+      console.log('the helden dodged');
+      return 'the action was dodged';
+    }
+
+    //if damage is dealt, calculate the damage
+    const damage = performerAp * (actionPerformed.effect / 100);
+    let newVe = targetInstance.instanceVe - damage;
+    //check values below 0
+    newVe = newVe < 0 ? 0 : newVe;
+
+    // update VE on target Instance
+    await sql`
+    UPDATE
+      helden_instance
+    SET
+      instance_ve = ${newVe}
+    WHERE
+      helden_instance_id = ${target}
+    RETURNING *;
+    `;
+  } else {
+    targetInstance = await getSingleEnemyInstance(target);
+
+    if (actionPerformed.type === 'healing') {
+      if (saAvaliable === 0) return;
+
+      await sql`
+      UPDATE
+        creature_instance
+      SET
+        sa_Avaliable = ${saAvaliable - 1}
+      WHERE
+        creature_instance_id = ${creatureInstanceId}
+      RETURNING *;
+      `;
+    }
+
+    //calculate the new VE
+    const healing = performerAp * (actionPerformed.effect / 100);
+    let newVe = targetInstance.instanceVe + healing;
+    //a helden cannot have more ve than his initial ve
+    newVe = newVe > targetInstance.ve ? targetInstance.ve : newVe;
+
+    await sql`
+    UPDATE
+      creature_instance
+    SET
+      instance_ve = ${newVe}
+    WHERE
+      creature_instance_id = ${target}
+    RETURNING *;
+    `;
+  }
+}
+
+async function getSingleHeldenInstance(instanceId) {
+  const [instance] = await sql`
+  SELECT
+    instance.*,
+    stats.ve_vital_energy as ve,
+    stats.ap_action_power as ap,
+    stats.sd_supernatural_defense as sd,
+    stats.pd_physical_defense as pd
+  FROM
+    helden_instance as instance,
+    helden_stats_set as stats,
+    helden
+  WHERE
+    instance.helden_instance_id = ${instanceId} AND
+    instance.helden_id = helden.helden_id AND
+    helden.stats_id = stats.stats_id
+
+`;
+
+  return camelcaseKeys(instance);
+}
+async function getSingleEnemyInstance(instanceId) {
+  const [instance] = await sql`
+  SELECT
+    instance.*,
+    stats.ve_vital_energy as ve,
+    stats.ap_action_power as ap,
+    stats.sd_supernatural_defense as sd,
+    stats.pd_physical_defense as pd
+  FROM
+    creature_instance as instance,
+    creature_stats_set as stats,
+    enemy_creatures as creature
+  WHERE
+    instance.creature_instance_id = ${instanceId} AND
+    instance.creature_id = creature.creature_id AND
+    creature.stats_id = stats.stats_id
+`;
+
+  return camelcaseKeys(instance);
+}
+
+function isActionDodged(defense) {
+  const isDodged = Math.random() <= defense / 100;
+  return isDodged;
+}
+
+async function getHeldenDamageNatureBy(heldenId) {
+  const [{ damage_nature }] = await sql`
+  SELECT class.damage_nature FROM
+    helden,
+    helden_class as class
+  WHERE
+    helden.helden_id = ${heldenId}
+  AND
+    helden.class_id = class.class_id
+  `;
+  return damage_nature;
+}
+
+async function getCreatureDamageNatureBy(creatureId) {
+  const [{ damage_nature }] = await sql`
+  SELECT type.damage_nature FROM
+    enemy_creatures as creatures,
+    creature_type as type
+  WHERE
+    creatures.creature_id = ${creatureId}
+  AND
+    creatures.creature_type_id = type.creature_type_id
+  `;
+  return damage_nature;
 }

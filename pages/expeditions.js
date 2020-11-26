@@ -94,13 +94,6 @@ export default store;
 export async function getServerSideProps(context) {
   const apolloClient = initializeApollo(null, context);
 
-  // await createExpeditionByHeldenId(96);
-  // await createExpeditionByHeldenId(95);
-  // await createExpeditionByHeldenId(94);
-  // await createExpeditionByHeldenId(93);
-  // await createExpeditionByHeldenId(98);
-  // await createExpeditionByHeldenId(95);
-
   const { session: token } = nextCookies(context);
   const loggedIn = await isSessionTokenValid(token);
 
