@@ -49,6 +49,17 @@ const typeDefs = gql`
     combatInstance: CombatInstance
     playerTeam: [HeldenInstance]
     enemyTeam: [CreatureInstance]
+    results: TurnResults
+  }
+
+  type TurnResults {
+    heldenActionsResults: [VeChanges]
+    creatureActionsResults: [VeChanges]
+  }
+
+  type VeChanges {
+    newVe: Int
+    targetTeam: String
   }
 
   type CombatInstance {

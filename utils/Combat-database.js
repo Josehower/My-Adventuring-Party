@@ -273,28 +273,33 @@ export async function updateCombat(script, gameId) {
   const playerTeamActions = script.playerTeam.filter((action) => action);
   const playerLoopAmount = playerTeamActions.length;
 
+  let heldenActionsResults = [];
+  let creatureActionsResults = [];
+
   if (combatInstance.actualTurn % 2) {
     console.log(combatInstance.actualTurn, 'first action creatures');
     for (let i = 0; i < enemyLoopAmount; i++) {
       const currentAction = enemyTeamActions[i];
-      await enemyActionResolver(currentAction);
+      creatureActionsResults.push(await enemyActionResolver(currentAction));
     }
 
     for (let i = 0; i < playerLoopAmount; i++) {
       const currentAction = playerTeamActions[i];
-      await heldenActionResolver(currentAction);
+      heldenActionsResults.push(await heldenActionResolver(currentAction));
     }
+    console.log(creatureActionsResults, heldenActionsResults);
   } else {
     console.log(combatInstance.actualTurn, 'first action helden');
     for (let i = 0; i < playerLoopAmount; i++) {
       const currentAction = playerTeamActions[i];
-      await heldenActionResolver(currentAction);
+      heldenActionsResults.push(await heldenActionResolver(currentAction));
     }
 
     for (let i = 0; i < enemyLoopAmount; i++) {
       const currentAction = enemyTeamActions[i];
-      await enemyActionResolver(currentAction);
+      creatureActionsResults.push(await enemyActionResolver(currentAction));
     }
+    console.log(heldenActionsResults, creatureActionsResults);
   }
 
   await sql`
@@ -330,7 +335,10 @@ export async function updateCombat(script, gameId) {
     return creature;
   });
 
-  return newCombatState;
+  return {
+    ...newCombatState,
+    results: { heldenActionsResults, creatureActionsResults },
+  };
 }
 
 async function heldenActionResolver({ actionId, heldenInstanceId, target }) {
@@ -346,6 +354,7 @@ async function heldenActionResolver({ actionId, heldenInstanceId, target }) {
   // console.log(await getSingleHeldenInstance(heldenInstanceId));
 
   let targetInstance;
+  let newTargetState;
 
   const actionPerformed = (await getHeldenActionsById(heldenId)).find(
     (action) => action.action_id === actionId,
@@ -384,7 +393,10 @@ async function heldenActionResolver({ actionId, heldenInstanceId, target }) {
 
     if (isDodged) {
       console.log('action dodged');
-      return 'the action was dodged';
+      return {
+        newVe: -1,
+        targetTeam: 'enemy',
+      };
     }
 
     //if damaga is dealt, calculate the damafe
@@ -394,7 +406,7 @@ async function heldenActionResolver({ actionId, heldenInstanceId, target }) {
     newVe = newVe < 0 ? 0 : newVe;
 
     // update VE on target Instance
-    await sql`
+    newTargetState = await sql`
     UPDATE
       creature_instance
     SET
@@ -426,7 +438,7 @@ async function heldenActionResolver({ actionId, heldenInstanceId, target }) {
     //a helden cannot have more ve than his initial ve
     newVe = newVe > targetInstance.ve ? targetInstance.ve : newVe;
 
-    await sql`
+    newTargetState = await sql`
     UPDATE
       helden_instance
     SET
@@ -436,6 +448,10 @@ async function heldenActionResolver({ actionId, heldenInstanceId, target }) {
     RETURNING *;
     `;
   }
+  return {
+    newVe: newTargetState[0].instance_ve,
+    targetTeam: actionPerformed.target,
+  };
 }
 
 async function enemyActionResolver({ actionId, creatureInstanceId, target }) {
@@ -452,6 +468,7 @@ async function enemyActionResolver({ actionId, creatureInstanceId, target }) {
   } = await getSingleEnemyInstance(creatureInstanceId);
 
   let targetInstance;
+  let newTargetState;
 
   const actionPerformed = (await getCreatureActionsById(creatureId)).find(
     (action) => action.action_id === actionId,
@@ -490,7 +507,10 @@ async function enemyActionResolver({ actionId, creatureInstanceId, target }) {
 
     if (isDodged) {
       console.log('the helden dodged');
-      return 'the action was dodged';
+      return {
+        newVe: -1,
+        targetTeam: 'enemy',
+      };
     }
 
     //if damage is dealt, calculate the damage
@@ -500,7 +520,7 @@ async function enemyActionResolver({ actionId, creatureInstanceId, target }) {
     newVe = newVe < 0 ? 0 : newVe;
 
     // update VE on target Instance
-    await sql`
+    newTargetState = await sql`
     UPDATE
       helden_instance
     SET
@@ -532,7 +552,7 @@ async function enemyActionResolver({ actionId, creatureInstanceId, target }) {
     //a helden cannot have more ve than his initial ve
     newVe = newVe > targetInstance.ve ? targetInstance.ve : newVe;
 
-    await sql`
+    newTargetState = await sql`
     UPDATE
       creature_instance
     SET
@@ -542,6 +562,10 @@ async function enemyActionResolver({ actionId, creatureInstanceId, target }) {
     RETURNING *;
     `;
   }
+  return {
+    newVe: newTargetState[0].instance_ve,
+    targetTeam: actionPerformed.target,
+  };
 }
 
 async function getSingleHeldenInstance(instanceId) {
