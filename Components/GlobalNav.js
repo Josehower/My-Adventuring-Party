@@ -38,7 +38,7 @@ const Wrapper = styled.div`
   }
 `;
 
-export default function GlobalNav(props) {
+const GlobalNav = (props) => {
   const isPlayerLogged = props.loggedIn;
   return (
     <>
@@ -52,4 +52,6 @@ export default function GlobalNav(props) {
       {props.children}
     </>
   );
-}
+};
+
+export default GlobalNav;

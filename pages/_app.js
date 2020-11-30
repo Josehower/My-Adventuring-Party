@@ -1,10 +1,10 @@
 import GlobalStyle, { colors } from '../styles/globalStyles';
-import GlobalNav from '../components/GlobalNav';
 import { ApolloProvider } from '@apollo/client';
 import { useApollo } from '../apollo/client';
 import { useState } from 'react';
 import styled from 'styled-components';
 import GameNav from '../components/GameNav';
+import GlobalNav from '../components/GlobalNav';
 import Head from 'next/head';
 
 const Prompt = styled.div`
@@ -44,11 +44,11 @@ function MyApp({ Component, pageProps }) {
         <link
           href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
           rel="stylesheet"
-        ></link>
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap"
           rel="stylesheet"
-        ></link>
+        />
       </Head>
 
       <GlobalStyle />
