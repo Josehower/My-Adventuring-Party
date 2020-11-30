@@ -2,10 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { initializeApollo } from '../apollo/client';
 import { isSessionTokenValid } from '../utils/auth';
 import nextCookies from 'next-cookies';
-import {
-  deleteCombatInstance,
-  initializeCombat,
-} from '../utils/Combat-database';
 import styled, { keyframes } from 'styled-components';
 import { useForm } from 'react-hook-form';
 import CombatTeamParty from '../components/CombatTeamParty';
@@ -116,6 +112,65 @@ const SubmitButton = styled.button`
   }
 `;
 
+const initCombatMutation = gql`
+  mutation initCombat {
+    initCombat {
+      combatInstance {
+        combatId
+        actualTurn
+        gameId
+      }
+      playerTeam {
+        actions {
+          heldenId
+          actionId
+          desc
+          name
+          target
+          speed
+        }
+        ap
+        combatId
+        heldenId
+        heldenInstanceId
+        instanceVe
+        name
+        pd
+        saAvaliable
+        sd
+        slotPosition
+        class {
+          classImg
+          className
+        }
+      }
+      enemyTeam {
+        actions {
+          creatureId
+          actionId
+          desc
+          name
+          target
+          speed
+        }
+        ap
+        combatId
+        creatureId
+        creatureInstanceId
+        instanceVe
+        name
+        pd
+        saAvaliable
+        sd
+        slotPosition
+        type {
+          typeImage
+        }
+      }
+    }
+  }
+`;
+
 const updateCombatMutation = gql`
   mutation updateCombat($combatScript: TurnScript!) {
     updateCombat(script: $combatScript) {
@@ -186,10 +241,10 @@ const updateCombatMutation = gql`
 `;
 
 const StoryMode = (props) => {
-  const initialState = klona(props.clientInfo);
+  const [initialState, setInitialState] = useState();
   const { register, handleSubmit, errors, watch } = useForm();
 
-  const [clientData, setClientData] = useState(props.clientInfo);
+  const [clientData, setClientData] = useState();
   const [stateChangesQueve, setChangesQueve] = useState([]);
 
   const [activeEnemy, setActiveEnemy] = useState(0);
@@ -204,13 +259,27 @@ const StoryMode = (props) => {
   const [combatDefinition, setCombatDefinition] = useState();
 
   const [updateCombat] = useMutation(updateCombatMutation);
+  const [initCombat] = useMutation(initCombatMutation);
 
-  const enemyTeamVitalEnergy = clientData.enemyTeam.reduce((acc, enemy) => {
+  const enemyTeamVitalEnergy = clientData?.enemyTeam?.reduce((acc, enemy) => {
     return enemy.instanceVe + acc;
   }, 0);
-  const playerTeamVitalEnergy = clientData.playerTeam.reduce((acc, helden) => {
-    return helden.instanceVe + acc;
-  }, 0);
+  const playerTeamVitalEnergy = clientData?.playerTeam?.reduce(
+    (acc, helden) => {
+      return helden.instanceVe + acc;
+    },
+    0,
+  );
+
+  async function startCombat() {
+    const { data } = await initCombat();
+    setClientData(data.initCombat);
+    setInitialState(klona(data.initCombat));
+    props.setPrompt(
+      'wow this dark helden want to take the village by the force. Please defend us!',
+    );
+    setCombatDefinition('battleOn');
+  }
 
   async function animateAction({
     performerPos,
@@ -472,25 +541,39 @@ const StoryMode = (props) => {
 
   useEffect(() => {
     props.setPrompt(`    combat turn #
-  ${clientData.combatInstance.actualTurn}
+  ${clientData?.combatInstance?.actualTurn}
   ${
-    clientData.combatInstance.actualTurn % 2
+    clientData?.combatInstance?.actualTurn % 2
       ? 'first move is on Enemies'
       : 'first move is on Party'
   }`);
-    clientData.combatInstance.actualTurn % 2
+    clientData?.combatInstance?.actualTurn % 2
       ? setTeamPriority(['enemy', 'party'])
       : setTeamPriority(['party', 'enemy']);
   }, [clientData]);
 
-  if (!props.clientInfo) {
-    return <h1>No Party</h1>;
+  useEffect(() => {
+    console.log(props.isCombatActive);
+    if (props.isCombatActive) {
+      startCombat();
+    }
+  }, []);
+
+  //TODO: resolve when no helden on party
+  //TODO: resolve when combat is open and helden dissapear
+  //TODO: resolve when less then 5 helden on party
+  //TODO: resolve what happen when battle is on and change pages
+
+  if (!clientData && props.isCombatActive) {
+    return 'lading battle...';
   }
   if (playerTeamVitalEnergy + enemyTeamVitalEnergy === 0) {
-    return 'DRAW';
+    // return 'DRAW';
+    return <VictoryFrame definition={setCombatDefinition} />;
   }
   if (playerTeamVitalEnergy === 0) {
-    return 'DEFEAT';
+    // return 'DEFEAT';
+    return <VictoryFrame definition={setCombatDefinition} />;
   }
   if (combatDefinition === 'victory') {
     return <VictoryFrame definition={setCombatDefinition} />;
@@ -533,14 +616,7 @@ const StoryMode = (props) => {
 
   return (
     <MapFrame>
-      <BattleButton
-        onClick={() => {
-          props.setPrompt(
-            'wow this dark helden want to take the village by the force. Please defend us!',
-          );
-          setCombatDefinition('battleOn');
-        }}
-      >
+      <BattleButton onClick={startCombat}>
         <img src="/alert.svg" alt="alert" />
       </BattleButton>
     </MapFrame>
@@ -563,13 +639,20 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  await deleteCombatInstance(1);
-  const clientInfo = await initializeCombat(1);
+  const {
+    data: { isCombatActive },
+  } = await apolloClient.query({
+    query: gql`
+      query {
+        isCombatActive
+      }
+    `,
+  });
 
   return {
     props: {
       loggedIn,
-      clientInfo,
+      isCombatActive,
       initialApolloState: apolloClient.cache.extract(),
     },
   };

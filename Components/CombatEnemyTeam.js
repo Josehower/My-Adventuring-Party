@@ -197,8 +197,8 @@ const CombatEnemyTeam = (props) => {
   return (
     <TeamFrame>
       {props.clientInfo.enemyTeam
-        .sort((a, b) => a.slotPosition - b.slotPosition)
-        .map((creature, index) => (
+        ?.sort((a, b) => a.slotPosition - b.slotPosition)
+        ?.map((creature, index) => (
           <EnemyWrapper>
             <AvatarDiv
               ap={creature.ap}

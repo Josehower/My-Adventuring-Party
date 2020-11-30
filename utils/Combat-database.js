@@ -18,9 +18,6 @@ export async function initializeCombat(gameId) {
     return false;
   }
 
-  //TODO: design how to define a winer after all  players of a party are at 0 live.
-  //TODO: use apollo to make the initial call and define it from a start battle function.
-
   const combatInstance = await getCombatInstace(gameId);
 
   const enemyInstances = await getEnemyInstances(combatInstance.combatId);
@@ -82,6 +79,18 @@ export async function initializeCombat(gameId) {
   };
 
   return responseObj;
+}
+
+export async function isCombatInstanceOn(gameId) {
+  let [combatInstance] = await sql`
+  SELECT * FROM combat_instance
+  WHERE game_id = ${gameId}`;
+
+  if (combatInstance === undefined) {
+    return false;
+  }
+
+  return camelcaseKeys(combatInstance);
 }
 
 async function getCombatInstace(gameId) {

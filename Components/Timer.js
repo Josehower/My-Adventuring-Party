@@ -47,7 +47,7 @@ const Timer = (props) => {
     daysUntilEnd * 24 * 60 * 60;
 
   return (
-    <div>
+    <div className={props.className}>
       {daysUntilEnd}:{hoursUntilEnd}:{minutesUntilEnd}:{secondsUntilEnd}
     </div>
   );

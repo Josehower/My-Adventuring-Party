@@ -1,5 +1,14 @@
+import { gql, useMutation } from '@apollo/client';
 import React from 'react';
 import styled from 'styled-components';
+
+const deleteCombatMutation = gql`
+  mutation deleteCombat {
+    deleteCombat {
+      message
+    }
+  }
+`;
 
 const Frame = styled.div`
   width: 50vw;
@@ -30,6 +39,14 @@ const Frame = styled.div`
 `;
 
 const VictoryFrame = (props) => {
+  const [deleteCombat] = useMutation(deleteCombatMutation);
+
+  async function resetCombat() {
+    props.definition('');
+    const { data } = await deleteCombat();
+    console.log(data.deleteCombat);
+  }
+
   return (
     <Frame>
       <h1>CONGRATULATIONS ADVENTURER</h1>
@@ -38,10 +55,10 @@ const VictoryFrame = (props) => {
       <hr />
       <h3>this are your rewards:</h3>
       <ul>
-        <li>2 Potion</li>
+        <li>2 Basic Potion</li>
         <li>300 gold</li>
       </ul>
-      <button onClick={() => props.definition('')}>back</button>
+      <button onClick={resetCombat}>back</button>
     </Frame>
   );
 };

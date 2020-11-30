@@ -191,8 +191,8 @@ const CombatTeamParty = (props) => {
   return (
     <TeamFrame>
       {props.clientInfo.playerTeam
-        .sort((a, b) => a.slotPosition - b.slotPosition)
-        .map((helden, index) => (
+        ?.sort((a, b) => a.slotPosition - b.slotPosition)
+        ?.map((helden, index) => (
           <Wrapper>
             {helden.instanceVe <= 0 ? (
               <div></div>

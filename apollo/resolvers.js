@@ -5,6 +5,7 @@ import {
   deleteCombatInstance,
   initializeCombat,
   updateCombat,
+  isCombatInstanceOn,
 } from '../utils/Combat-database';
 import {
   createExpeditionByHeldenId,
@@ -32,6 +33,15 @@ import {
 
 const resolvers = {
   Query: {
+    async isCombatActive(p, args, context) {
+      const gameId = await getGameIdFromContext(context);
+      const isAllowed = await isThisCallAllowed(context);
+      if (isAllowed) {
+        return (await isCombatInstanceOn(gameId)) ? true : false;
+      }
+      return;
+    },
+
     async expeditionTimeLeft(p, args, context) {
       const isAllowed = await isThisCallAllowed(context);
       if (isAllowed) {

@@ -78,16 +78,21 @@ export async function getGameExpeditionList(gameId) {
     stat.lvl_level,
     h.name,
     h.helden_id,
-    e.expedition_start_date
+    e.expedition_start_date,
+    c.class_name,
+    c.class_image
   FROM
-    helden as h
-  JOIN expedition as e
-    ON e.helden_id = h.helden_id
-  JOIN helden_stats_set as stat
-    ON h.stats_id = stat.stats_id
-  JOIN game_instance as g
-    ON h.game_id = g.game_id
-  WHERE g.game_id = ${gameId};`;
+    helden as h,
+    expedition as e,
+    helden_stats_set as stat,
+    game_instance as g,
+    helden_class as c
+  WHERE
+    g.game_id = ${gameId} AND
+    e.helden_id = h.helden_id AND
+    h.stats_id = stat.stats_id AND
+    h.game_id = g.game_id AND
+    h.class_id = c.class_id;`;
 
   return expeditionList.map((expedition) => camelcaseKeys(expedition));
 }

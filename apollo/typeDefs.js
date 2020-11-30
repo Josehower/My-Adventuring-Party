@@ -8,6 +8,7 @@ const typeDefs = gql`
     heldenList: [Helden]
     expeditionList: [Expedition]
     expeditionTimeLeft(heldenId: Int!): String
+    isCombatActive: Boolean
   }
 
   type Mutation {
@@ -126,6 +127,8 @@ const typeDefs = gql`
     name: String
     lvlLevel: Int
     expeditionStartDate: String
+    className: String
+    classImage: String
   }
 
   type Helden {

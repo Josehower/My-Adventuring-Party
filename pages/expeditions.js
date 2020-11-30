@@ -3,9 +3,27 @@ import React from 'react';
 import { initializeApollo } from '../apollo/client';
 import { isSessionTokenValid } from '../utils/auth';
 import nextCookies from 'next-cookies';
-import Timer from '../components/Timer';
 import { heldenListQuery } from './helden';
 import { useForm } from 'react-hook-form';
+import HeldenExpeditionCard from '../components/heldenExpeditionCard';
+import styled from 'styled-components';
+
+const CardWrapper = styled.div`
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+`;
+
+const Select = styled.select`
+  pointer-events: ${(props) => (props.activeExpAmount > 4 ? 'none' : 'all')};
+  cursor: ${(props) => (props.activeExpAmount > 4 ? 'not-allowed' : 'pointer')};
+  background: ${(props) => (props.activeExpAmount > 4 ? 'gray' : 'white')};
+`;
+
+const SubmitButton = styled.button`
+  cursor: ${(props) => (props.activeExpAmount > 4 ? 'not-allowed' : 'pointer')};
+  background: ${(props) => (props.activeExpAmount > 4 ? 'gray' : 'white')};
+`;
 
 const createExpeditionMutation = gql`
   mutation createExpedition($heldenId: Int!) {
@@ -23,6 +41,8 @@ const expeditionListQuery = gql`
       gameId
       lvlLevel
       heldenId
+      className
+      classImage
     }
   }
 `;
@@ -35,7 +55,9 @@ const store = (props) => {
       },
     ],
   });
+
   const { data, loading, error, refetch } = useQuery(expeditionListQuery);
+
   const {
     data: { heldenList: heldenListData },
     loading: heldenLoading,
@@ -43,13 +65,20 @@ const store = (props) => {
   } = useQuery(heldenListQuery);
   const { register, handleSubmit, errors } = useForm();
 
-  async function onSubmit(data) {
-    const heldenId = parseInt(data.heldenToExpedition, 10);
-    const { data: crateHeldenMessage } = await createExpedition({
+  async function onSubmit(submitData) {
+    if (data.expeditionList.length > 4) {
+      return;
+    }
+    const heldenId = parseInt(submitData.heldenToExpedition, 10);
+    const {
+      data: {
+        createExpedition: { message },
+      },
+    } = await createExpedition({
       variables: { heldenId: heldenId },
     });
 
-    console.log('hola Amigos', crateHeldenMessage);
+    props.setPrompt(message);
 
     refetch();
   }
@@ -58,34 +87,69 @@ const store = (props) => {
   if (error || heldenError) return `${error}`;
 
   return (
-    <div>
-      {/* {<div>{JSON.stringify(data.expeditionList)}</div>} */}
-      {data.expeditionList.map((expedition) => (
-        <div key={expedition.heldenId}>
-          {console.log(expedition.heldenId)}
-          Helden name = {expedition.name} lvl = {expedition.lvlLevel}
-          <Timer heldenId={expedition.heldenId} refetcher={refetch} />
-        </div>
-      ))}
-
-      {/* {<div>{JSON.stringify(heldenListData[0])}</div>} */}
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <select
+    <CardWrapper>
+      <HeldenExpeditionCard
+        data={data}
+        heldenListData={heldenListData}
+        refetch={refetch}
+        slot={0}
+      />
+      <HeldenExpeditionCard
+        data={data}
+        heldenListData={heldenListData}
+        refetch={refetch}
+        slot={1}
+      />
+      <HeldenExpeditionCard
+        data={data}
+        heldenListData={heldenListData}
+        refetch={refetch}
+        slot={2}
+      />
+      <HeldenExpeditionCard
+        data={data}
+        heldenListData={heldenListData}
+        refetch={refetch}
+        slot={3}
+      />
+      <HeldenExpeditionCard
+        data={data}
+        heldenListData={heldenListData}
+        refetch={refetch}
+        slot={4}
+      />
+      <form
+        activeExpAmount={data.expeditionList.length}
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <Select
           name="heldenToExpedition"
           id="expedition"
           ref={register({ required: true })}
+          activeExpAmount={data.expeditionList.length}
         >
-          {heldenListData.map((helden) => (
-            <option value={helden.id}>{helden.name}</option>
-          ))}
-        </select>
+          {heldenListData
+            .filter((helden) => {
+              const idsOnExpeditionList = data.expeditionList.map(
+                (heldenOnExp) => heldenOnExp.heldenId,
+              );
+              return !idsOnExpeditionList.includes(helden.id);
+            })
+            .map((helden) => (
+              <option value={helden.id}>{helden.name}</option>
+            ))}
+        </Select>
         {errors.heldenToExpedition && (
           <div>{JSON.stringify(errors.heldenToExpedition)}</div>
         )}
-        <button type="submit">Send to Expedition</button>
+        <SubmitButton
+          type="submit"
+          activeExpAmount={data.expeditionList.length}
+        >
+          Send to Expedition
+        </SubmitButton>
       </form>
-    </div>
+    </CardWrapper>
   );
 };
 
