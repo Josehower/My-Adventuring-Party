@@ -7,93 +7,62 @@ import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
 
 setPostgresDefaultsOnHeroku();
 
-
 dotenv.config();
 
-export async function initializeCombat(gameId) {
-  const heldenList = await getHeldenListByGameId(gameId);
-
-  const partyList = heldenList
-    .filter((helden) => helden.partySlot !== null)
-    .sort((a, b) => a.partySlot - b.partySlot);
-
-  if (partyList.length === 0) {
-    return false;
-  }
-
-  const combatInstance = await getCombatInstace(gameId);
-
-  const enemyInstances = await getEnemyInstances(combatInstance.combatId);
-
-  const heldenInstances = await getHeldenInstances(
-    combatInstance.combatId,
-    partyList,
-  );
-
-  //get actions
-  const heldenActions = await Promise.all(
-    heldenInstances.map(
-      async (helden) => await getHeldenActionsById(helden.heldenId),
-    ),
-  );
-  const creaturesActions = await Promise.all(
-    enemyInstances.map(
-      async (creature) => await getCreatureActionsById(creature.creatureId),
-    ),
-  );
-
-  //atach actions to client data
-
-  const clientHeldenData = heldenInstances.map((heldenInstance) => {
-    const realHelden = partyList.find(
-      (helden) => heldenInstance.heldenId === helden.id,
-    );
-    const actions = heldenActions.find(
-      ([action]) => action.helden_id === heldenInstance.heldenId,
-    );
-
-    return {
-      ...heldenInstance,
-      ap: realHelden.stats.ap,
-      sd: realHelden.stats.sd,
-      pd: realHelden.stats.pd,
-      name: realHelden.name,
-      class: realHelden.class,
-      slotPosition: realHelden.partySlot,
-      actions: actions.map((action) => camelcaseKeys(action)),
-    };
-  });
-
-  const clientCreaturesData = enemyInstances.map((creatureInstance) => {
-    const actions = creaturesActions.find(
-      ([action]) => creatureInstance.creatureId === action.creature_id,
-    );
-
-    return {
-      ...creatureInstance,
-      actions: actions.map((action) => camelcaseKeys(action)),
-    };
-  });
-
-  const responseObj = {
-    combatInstance: combatInstance,
-    playerTeam: clientHeldenData,
-    enemyTeam: clientCreaturesData,
-  };
-
-  return responseObj;
+async function getHeldenActionsById(heldenId) {
+  return await sql`
+  SELECT
+    helden.helden_id as helden_id,
+    action.combat_action_id as action_id,
+    action.action_name as name,
+    action.action_desc as desc,
+    action.effect_ref as effect,
+    target.target_keyword_name as target,
+    type.action_type_name as type,
+    speed.speed_name as speed
+  FROM
+    helden,
+    class_actions_set as junction,
+    combat_action as action,
+    target_keyword as target,
+    action_type as type,
+    action_speed as speed
+  WHERE
+    helden.helden_id = ${heldenId} AND
+    helden.class_id = junction.class_id AND
+    junction.combat_action_id = action.combat_action_id AND
+    action.target_id = target.target_id AND
+    action.action_type_id = type.action_type_id AND
+    type.action_speed_id = speed.action_speed_id
+  `;
 }
 
-export async function isCombatInstanceOn(gameId) {
-  let [combatInstance] = await sql`
-  SELECT * FROM combat_instance
-  WHERE game_id = ${gameId}`;
-
-  if (combatInstance === undefined) {
-    return false;
-  }
-
-  return camelcaseKeys(combatInstance);
+async function getCreatureActionsById(creatureId) {
+  return await sql`
+  SELECT
+    creature.creature_id as creature_id,
+    action.combat_action_id as action_id,
+    action.action_name as name,
+    action.action_desc as desc,
+    action.effect_ref as effect,
+    target.target_keyword_name as target,
+    type.action_type_name as type,
+    speed.speed_name as speed
+  FROM
+    enemy_creatures as creature,
+    creature_actions_set as junction,
+    combat_action as action,
+    target_keyword as target,
+    action_type as type,
+    action_speed as speed
+  WHERE
+    creature.creature_id  = ${creatureId} AND
+    creature.creature_type_id = junction.creature_type_id AND
+    junction.combat_action_id = action.combat_action_id AND
+    action.target_id = target.target_id AND
+    action.action_type_id = type.action_type_id AND
+    type.action_speed_id = speed.action_speed_id
+  `;
 }
 
 async function getCombatInstace(gameId) {
@@ -109,12 +78,6 @@ async function getCombatInstace(gameId) {
   }
 
   return camelcaseKeys(combatInstance);
-}
-
-export async function deleteCombatInstance(gameId) {
-  await sql`DELETE FROM combat_instance WHERE game_id = ${gameId}`;
-
-  return { message: `combat was successfully deleted from game # ${gameId}` };
 }
 
 async function getHeldenInstances(combatId, partyList = null) {
@@ -156,7 +119,7 @@ async function getEnemyInstances(combatId) {
     FROM creature_instance
     WHERE combat_id = ${combatId}`;
 
-  //enemyParty is an array of 5 enemy names
+  // enemyParty is an array of 5 enemy names
   const enemyParty = testEncounter;
 
   const enemyPartyPromiseArray = enemyParty.map(
@@ -220,60 +183,96 @@ async function getEnemyInstances(combatId) {
     .map((instance) => camelcaseKeys(instance));
 }
 
-async function getHeldenActionsById(heldenId) {
-  return await sql`
-  SELECT
-    helden.helden_id as helden_id,
-    action.combat_action_id as action_id,
-    action.action_name as name,
-    action.action_desc as desc,
-    action.effect_ref as effect,
-    target.target_keyword_name as target,
-    type.action_type_name as type,
-    speed.speed_name as speed
-  FROM
-    helden,
-    class_actions_set as junction,
-    combat_action as action,
-    target_keyword as target,
-    action_type as type,
-    action_speed as speed
-  WHERE
-    helden.helden_id = ${heldenId} AND
-    helden.class_id = junction.class_id AND
-    junction.combat_action_id = action.combat_action_id AND
-    action.target_id = target.target_id AND
-    action.action_type_id = type.action_type_id AND
-    type.action_speed_id = speed.action_speed_id
-  `;
+export async function initializeCombat(gameId) {
+  const heldenList = await getHeldenListByGameId(gameId);
+
+  const partyList = heldenList
+    .filter((helden) => helden.partySlot !== null)
+    .sort((a, b) => a.partySlot - b.partySlot);
+
+  if (partyList.length === 0) {
+    return false;
+  }
+
+  const combatInstance = await getCombatInstace(gameId);
+
+  const enemyInstances = await getEnemyInstances(combatInstance.combatId);
+
+  const heldenInstances = await getHeldenInstances(
+    combatInstance.combatId,
+    partyList,
+  );
+
+  // get actions
+  const heldenActions = await Promise.all(
+    heldenInstances.map(
+      async (helden) => await getHeldenActionsById(helden.heldenId),
+    ),
+  );
+  const creaturesActions = await Promise.all(
+    enemyInstances.map(
+      async (creature) => await getCreatureActionsById(creature.creatureId),
+    ),
+  );
+
+  // atach actions to client data
+
+  const clientHeldenData = heldenInstances.map((heldenInstance) => {
+    const realHelden = partyList.find(
+      (helden) => heldenInstance.heldenId === helden.id,
+    );
+    const actions = heldenActions.find(
+      ([action]) => action.helden_id === heldenInstance.heldenId,
+    );
+
+    return {
+      ...heldenInstance,
+      ap: realHelden.stats.ap,
+      sd: realHelden.stats.sd,
+      pd: realHelden.stats.pd,
+      name: realHelden.name,
+      class: realHelden.class,
+      slotPosition: realHelden.partySlot,
+      actions: actions.map((action) => camelcaseKeys(action)),
+    };
+  });
+
+  const clientCreaturesData = enemyInstances.map((creatureInstance) => {
+    const actions = creaturesActions.find(
+      ([action]) => creatureInstance.creatureId === action.creature_id,
+    );
+
+    return {
+      ...creatureInstance,
+      actions: actions.map((action) => camelcaseKeys(action)),
+    };
+  });
+
+  const responseObj = {
+    combatInstance: combatInstance,
+    playerTeam: clientHeldenData,
+    enemyTeam: clientCreaturesData,
+  };
+
+  return responseObj;
 }
 
-async function getCreatureActionsById(creatureId) {
-  return await sql`
-  SELECT
-    creature.creature_id as creature_id,
-    action.combat_action_id as action_id,
-    action.action_name as name,
-    action.action_desc as desc,
-    action.effect_ref as effect,
-    target.target_keyword_name as target,
-    type.action_type_name as type,
-    speed.speed_name as speed
-  FROM
-    enemy_creatures as creature,
-    creature_actions_set as junction,
-    combat_action as action,
-    target_keyword as target,
-    action_type as type,
-    action_speed as speed
-  WHERE
-    creature.creature_id  = ${creatureId} AND
-    creature.creature_type_id = junction.creature_type_id AND
-    junction.combat_action_id = action.combat_action_id AND
-    action.target_id = target.target_id AND
-    action.action_type_id = type.action_type_id AND
-    type.action_speed_id = speed.action_speed_id
-  `;
+export async function isCombatInstanceOn(gameId) {
+  let [combatInstance] = await sql`
+  SELECT * FROM combat_instance
+  WHERE game_id = ${gameId}`;
+
+  if (combatInstance === undefined) {
+    return false;
+  }
+
+  return camelcaseKeys(combatInstance);
+}
+
+export async function deleteCombatInstance(gameId) {
+  await sql`DELETE FROM combat_instance WHERE game_id = ${gameId}`;
+
+  return { message: `combat was successfully deleted from game # ${gameId}` };
 }
 
 export async function updateCombat(script, gameId) {
@@ -285,8 +284,8 @@ export async function updateCombat(script, gameId) {
   const playerTeamActions = script.playerTeam.filter((action) => action);
   const playerLoopAmount = playerTeamActions.length;
 
-  let heldenActionsResults = [];
-  let creatureActionsResults = [];
+  const heldenActionsResults = [];
+  const creatureActionsResults = [];
 
   if (combatInstance.actualTurn % 2) {
     console.log(combatInstance.actualTurn, 'first action creatures');
@@ -357,9 +356,7 @@ async function heldenActionResolver({ actionId, heldenInstanceId, target }) {
   const {
     heldenInstanceId: instanceId,
     heldenId,
-    combatId,
     saAvaliable,
-    instanceVe,
     ap: performerAp,
   } = await getSingleHeldenInstance(heldenInstanceId);
 
@@ -469,14 +466,8 @@ async function heldenActionResolver({ actionId, heldenInstanceId, target }) {
 async function enemyActionResolver({ actionId, creatureInstanceId, target }) {
   const {
     creatureId,
-    combatId,
     saAvaliable,
-    instanceVe,
-    slotPosition,
-    ve: maxVe,
     ap: performerAp,
-    sd,
-    pd,
   } = await getSingleEnemyInstance(creatureInstanceId);
 
   let targetInstance;
@@ -525,10 +516,10 @@ async function enemyActionResolver({ actionId, creatureInstanceId, target }) {
       };
     }
 
-    //if damage is dealt, calculate the damage
+    // if damage is dealt, calculate the damage
     const damage = performerAp * (actionPerformed.effect / 100);
     let newVe = targetInstance.instanceVe - damage;
-    //check values below 0
+    // check values below 0
     newVe = newVe < 0 ? 0 : newVe;
 
     // update VE on target Instance
@@ -558,10 +549,10 @@ async function enemyActionResolver({ actionId, creatureInstanceId, target }) {
       `;
     }
 
-    //calculate the new VE
+    // calculate the new VE
     const healing = performerAp * (actionPerformed.effect / 100);
     let newVe = targetInstance.instanceVe + healing;
-    //a helden cannot have more ve than his initial ve
+    // a helden cannot have more ve than his initial ve
     newVe = newVe > targetInstance.ve ? targetInstance.ve : newVe;
 
     newTargetState = await sql`

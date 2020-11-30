@@ -8,6 +8,122 @@ setPostgresDefaultsOnHeroku();
 
 dotenv.config();
 
+async function getStatIncrementObj(statPrefix, heldenId) {
+  function isRareIncrement() {
+    const boolean10 = Math.random() <= 0.2;
+    return boolean10;
+  }
+  function isUncommonIncrement() {
+    const boolean50 = Math.random() <= 0.4;
+    return boolean50;
+  }
+  function isCommonIncrement() {
+    const boolean80 = Math.random() <= 0.8;
+    return boolean80;
+  }
+
+  // pull boostObject from id
+  const [boostObject] = await sql`
+  SELECT b.*, c.class_name
+  FROM
+  ${sql(`${statPrefix}_growth_set`)} as b,
+  expedition_class_growth as ecg,
+  helden_class as c,
+  helden as h
+  WHERE h.class_id = c.class_id
+  AND ecg.expedition_growth_id =  c.expedition_growth_id
+  AND b.${sql(`${statPrefix}_set_id`)} = ecg.${sql(`${statPrefix}_set_id`)}
+  AND h.helden_id = ${heldenId};
+    `;
+
+  // calculate rate
+  let increment = boostObject.allways_increment;
+
+  if (isCommonIncrement()) {
+    increment = boostObject.common_increment;
+  }
+  if (isUncommonIncrement()) {
+    increment = boostObject.uncommon_increment;
+  }
+  if (isRareIncrement()) {
+    increment = boostObject.rare_increment;
+  }
+
+  return increment;
+}
+
+export async function boostHeldenAfterExpedition(heldenId) {
+  console.log('boostHeldenAfterExpedition', heldenId);
+  const veIncrement = await getStatIncrementObj('ve', heldenId);
+  const apIncrement = await getStatIncrementObj('ap', heldenId);
+  const sdIncrement = await getStatIncrementObj('sd', heldenId);
+  const pdIncrement = await getStatIncrementObj('pd', heldenId);
+
+  const [{ stats_id: heldenStatsId }] = await sql`
+  SELECT stats_id, name
+  FROM helden
+  WHERE helden_id = ${heldenId};`;
+
+  const [stats] = await sql`
+  SELECT *  FROM helden_stats_set
+    WHERE stats_id = ${heldenStatsId};`;
+
+  const additionalVe = (veIncrement / 100) * stats.ve_vital_energy;
+  const newVe = Math.ceil(additionalVe + stats.ve_vital_energy);
+
+  const additionalAp = (apIncrement / 100) * stats.ap_action_power;
+  const newAp = Math.ceil(additionalAp + stats.ap_action_power);
+
+  let newSd;
+  if (stats.sd_supernatural_defense >= 30) {
+    newSd = 30;
+  } else {
+    const additionalSd = (sdIncrement / 100) * stats.sd_supernatural_defense;
+    newSd = Math.ceil(additionalSd + stats.sd_supernatural_defense);
+  }
+
+  let newPd;
+  if (stats.pd_physical_defense >= 30) {
+    newPd = 30;
+  } else {
+    const additionalPd = (pdIncrement / 100) * stats.pd_physical_defense;
+    newPd = Math.ceil(additionalPd + stats.pd_physical_defense);
+  }
+
+  let lvlUp = false;
+
+  const newExpShardValue = stats.exs_experience_shards + 1;
+  if (stats.exs_experience_shards === 4) {
+    await sql`
+      UPDATE helden_stats_set
+      SET
+      ve_vital_energy = ${newVe},
+      ap_action_power = ${newAp},
+      sd_supernatural_defense = ${newSd},
+      pd_physical_defense = ${newPd}
+      WHERE  stats_id  = ${heldenStatsId};`;
+
+    await levelUp(heldenId);
+    lvlUp = true;
+  } else {
+    await sql`
+      UPDATE helden_stats_set
+      SET
+      ve_vital_energy = ${newVe},
+      ap_action_power = ${newAp},
+      sd_supernatural_defense = ${newSd},
+      pd_physical_defense = ${newPd},
+      exs_experience_shards = ${newExpShardValue}
+      WHERE  stats_id  = ${heldenStatsId};`;
+  }
+
+  return {
+    message: `your helden came from the expedition with more stats ${
+      lvlUp ? 'and lvlUp' : ''
+    }`,
+  };
+}
+
 export async function getExpeditionByHeldenId(heldenId) {
   const [expeditionData] = await sql`
   SELECT
@@ -119,7 +235,7 @@ export async function getHeldenExpeditionTimeLeft(heldenId) {
     return false;
   }
 
-  const [{ end_date: endTime, expedition_id }] = await sql`
+  const [{ end_date: endTime, expedition_id: expeditionId }] = await sql`
   SELECT
     e.expedition_start_date + i.expedition_interval as end_date,
     e.expedition_id
@@ -135,127 +251,11 @@ export async function getHeldenExpeditionTimeLeft(heldenId) {
   if (isExpeditionExpired) {
     console.log('expired and deleted on getHeldenExpeditionTimeLeft', heldenId);
     await boostHeldenAfterExpedition(heldenId);
-    await sql`DELETE FROM expedition WHERE expedition_id = ${expedition_id} `;
+    await sql`DELETE FROM expedition WHERE expedition_id = ${expeditionId} `;
     return false;
   }
 
   const timeUntilExpiration = +endTime - Date.now();
 
   return timeUntilExpiration;
-}
-
-async function getStatIncrementObj(statPrefix, heldenId) {
-  function isRareIncrement() {
-    const boolean10 = Math.random() <= 0.2;
-    return boolean10;
-  }
-  function isUncommonIncrement() {
-    const boolean50 = Math.random() <= 0.4;
-    return boolean50;
-  }
-  function isCommonIncrement() {
-    const boolean80 = Math.random() <= 0.8;
-    return boolean80;
-  }
-
-  //pull boostObject from id
-  const [boostObject] = await sql`
-  SELECT b.*, c.class_name
-  FROM
-  ${sql(`${statPrefix}_growth_set`)} as b,
-  expedition_class_growth as ecg,
-  helden_class as c,
-  helden as h
-  WHERE h.class_id = c.class_id
-  AND ecg.expedition_growth_id =  c.expedition_growth_id
-  AND b.${sql(`${statPrefix}_set_id`)} = ecg.${sql(`${statPrefix}_set_id`)}
-  AND h.helden_id = ${heldenId};
-    `;
-
-  //calculate rate
-  let increment = boostObject.allways_increment;
-
-  if (isCommonIncrement()) {
-    increment = boostObject.common_increment;
-  }
-  if (isUncommonIncrement()) {
-    increment = boostObject.uncommon_increment;
-  }
-  if (isRareIncrement()) {
-    increment = boostObject.rare_increment;
-  }
-
-  return increment;
-}
-
-export async function boostHeldenAfterExpedition(heldenId) {
-  console.log('boostHeldenAfterExpedition', heldenId);
-  const veIncrement = await getStatIncrementObj('ve', heldenId);
-  const apIncrement = await getStatIncrementObj('ap', heldenId);
-  const sdIncrement = await getStatIncrementObj('sd', heldenId);
-  const pdIncrement = await getStatIncrementObj('pd', heldenId);
-
-  const [{ stats_id: heldenStatsId }] = await sql`
-  SELECT stats_id, name
-  FROM helden
-  WHERE helden_id = ${heldenId};`;
-
-  const [stats] = await sql`
-  SELECT *  FROM helden_stats_set
-    WHERE stats_id = ${heldenStatsId};`;
-
-  const additionalVe = (veIncrement / 100) * stats.ve_vital_energy;
-  const newVe = Math.ceil(additionalVe + stats.ve_vital_energy);
-
-  const additionalAp = (apIncrement / 100) * stats.ap_action_power;
-  const newAp = Math.ceil(additionalAp + stats.ap_action_power);
-
-  let newSd;
-  if (stats.sd_supernatural_defense >= 30) {
-    newSd = 30;
-  } else {
-    const additionalSd = (sdIncrement / 100) * stats.sd_supernatural_defense;
-    newSd = Math.ceil(additionalSd + stats.sd_supernatural_defense);
-  }
-
-  let newPd;
-  if (stats.pd_physical_defense >= 30) {
-    newPd = 30;
-  } else {
-    const additionalPd = (pdIncrement / 100) * stats.pd_physical_defense;
-    newPd = Math.ceil(additionalPd + stats.pd_physical_defense);
-  }
-
-  let lvlUp = false;
-
-  const newExpShardValue = stats.exs_experience_shards + 1;
-  if (stats.exs_experience_shards === 4) {
-    await sql`
-      UPDATE helden_stats_set
-      SET
-      ve_vital_energy = ${newVe},
-      ap_action_power = ${newAp},
-      sd_supernatural_defense = ${newSd},
-      pd_physical_defense = ${newPd}
-      WHERE  stats_id  = ${heldenStatsId};`;
-
-    await levelUp(heldenId);
-    lvlUp = true;
-  } else {
-    await sql`
-      UPDATE helden_stats_set
-      SET
-      ve_vital_energy = ${newVe},
-      ap_action_power = ${newAp},
-      sd_supernatural_defense = ${newSd},
-      pd_physical_defense = ${newPd},
-      exs_experience_shards = ${newExpShardValue}
-      WHERE  stats_id  = ${heldenStatsId};`;
-  }
-
-  return {
-    message: `your helden came from the expedition with more stats ${
-      lvlUp ? 'and lvlUp' : ''
-    }`,
-  };
 }

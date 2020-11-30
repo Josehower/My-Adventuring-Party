@@ -5,7 +5,7 @@ import { isSessionTokenValid } from '../utils/auth';
 import nextCookies from 'next-cookies';
 import { heldenListQuery } from './helden';
 import { useForm } from 'react-hook-form';
-import HeldenExpeditionCard from '../components/heldenExpeditionCard';
+import HeldenExpeditionCard from '../components/HeldenExpeditionCard';
 import styled from 'styled-components';
 
 const CardWrapper = styled.div`
@@ -47,7 +47,7 @@ const expeditionListQuery = gql`
   }
 `;
 
-const store = (props) => {
+const Store = (props) => {
   const [createExpedition] = useMutation(createExpeditionMutation, {
     refetchQueries: [
       {
@@ -153,7 +153,7 @@ const store = (props) => {
   );
 };
 
-export default store;
+export default Store;
 
 export async function getServerSideProps(context) {
   const apolloClient = initializeApollo(null, context);
