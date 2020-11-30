@@ -1,13 +1,17 @@
 {
   "name": "my-adventuring-party",
   "version": "0.1.0",
+  "engines": {
+    "node": "14.14.0"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p ${PORT:-\"3000\"}",
     "migrate": "dotenv ley",
-    "dbt": "yarn migrate down && yarn migrate up"
+    "dbt": "yarn migrate down && yarn migrate up",
+    "heroku-postbuild": "yarn migrate up && yarn build"
   },
   "dependencies": {
     "@apollo/client": "^3.2.5",
@@ -29,5 +33,6 @@
     "react-dom": "17.0.1",
     "react-hook-form": "^6.10.1",
     "styled-components": "^5.2.1"
-  }
+  },
+  "cacheDirectories": [".next/cache"]
 }

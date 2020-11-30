@@ -1,3 +1,0 @@
-1. implement the register in a propper way.
-2. be able to create and auth users.
-3. implement the nomadic store

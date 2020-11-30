@@ -3,7 +3,10 @@ import camelcaseKeys from 'camelcase-keys';
 import { sql } from './account-database';
 import { getHeldenListByGameId } from './helden-database';
 import { testEncounter } from './encounterList';
-import { throwServerError } from '@apollo/client';
+import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
+
+setPostgresDefaultsOnHeroku();
+
 
 dotenv.config();
 

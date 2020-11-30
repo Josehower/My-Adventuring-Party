@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
 import camelcaseKeys from 'camelcase-keys';
 import { sql } from './account-database';
+import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
+
+setPostgresDefaultsOnHeroku();
 
 dotenv.config();
 
