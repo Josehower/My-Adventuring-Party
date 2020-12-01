@@ -288,7 +288,7 @@ const StoryMode = (props) => {
     targetFunc,
     delta,
   }) {
-    //seting the delta
+    // seting the delta
 
     const damageLog = delta === 0 ? 'N/A' : delta.toString();
 
@@ -325,14 +325,14 @@ const StoryMode = (props) => {
           creature: setTargetedEnemy,
         },
       };
-      const performerTeam = action.team; //creature or Helden
+      const performerTeam = action.team; // creature or Helden
       const targetTeam =
         targetOptions[performerTeam][
-          action.targetKey /*TagetKey can be "party" or "enemy"*/
-        ]; //creature or Helden
+          action.targetKey /* TagetKey can be "party" or "enemy" */
+        ]; // creature or Helden
 
-      const targetPosition = parseInt(action.TargetPosistion); //positionNumber
-      const PerformerAnimationFunct = animation[action.team].perform;
+      const targetPosition = parseInt(action.TargetPosistion); // positionNumber
+      const performerAnimationFunct = animation[action.team].perform;
       const targetAnimationFunc = animation[performerTeam][targetTeam];
 
       if (!results) {
@@ -343,7 +343,7 @@ const StoryMode = (props) => {
         animation: {
           performerPos: action.performerPos,
           targetPos: targetPosition,
-          performerFunc: PerformerAnimationFunct,
+          performerFunc: performerAnimationFunct,
           targetFunc: targetAnimationFunc,
         },
         results: { newVe: results?.newVe, targetTeam, targetPosition },
@@ -479,7 +479,7 @@ const StoryMode = (props) => {
         }
       }
     } else {
-      //if enemyFirst
+      // if enemyFirst
       for (let i = 0; i < rawEnemyActions.length; i++) {
         if (rawEnemyActions[i]) {
           const renderAction = await produceAction(
@@ -529,15 +529,28 @@ const StoryMode = (props) => {
           await pause(800);
         } else {
           setCombatStep(0);
+          if (enemyTeamVitalEnergy === 0 && playerTeamVitalEnergy === 0) {
+            await pause(1000);
+            setCombatDefinition('draw');
+          }
           if (enemyTeamVitalEnergy === 0) {
             await pause(1000);
             setCombatDefinition('victory');
+          }
+          if (playerTeamVitalEnergy === 0) {
+            await pause(1000);
+            setCombatDefinition('defeat');
           }
         }
       }
     }, 900);
     return () => clearTimeout(timeout);
-  }, [clientData, stateChangesQueve]);
+  }, [
+    clientData,
+    stateChangesQueve,
+    enemyTeamVitalEnergy,
+    playerTeamVitalEnergy,
+  ]);
 
   useEffect(() => {
     props.setPrompt(`    combat turn #
@@ -559,19 +572,19 @@ const StoryMode = (props) => {
     }
   }, []);
 
-  //TODO: resolve when no helden on party
-  //TODO: resolve when combat is open and helden dissapear
-  //TODO: resolve when less then 5 helden on party
-  //TODO: resolve what happen when battle is on and change pages
+  // TODO: resolve when no helden on party
+  // TODO: resolve when combat is open and helden dissapear
+  // TODO: resolve when less then 5 helden on party
+  // TODO: resolve what happen when battle is on and change pages
 
   if (!clientData && props.isCombatActive) {
     return 'lading battle...';
   }
-  if (playerTeamVitalEnergy + enemyTeamVitalEnergy === 0) {
+  if (combatDefinition === 'draw') {
     // return 'DRAW';
     return <VictoryFrame definition={setCombatDefinition} />;
   }
-  if (playerTeamVitalEnergy === 0) {
+  if (combatDefinition === 'defeat') {
     // return 'DEFEAT';
     return <VictoryFrame definition={setCombatDefinition} />;
   }

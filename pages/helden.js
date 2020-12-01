@@ -6,45 +6,79 @@ import nextCookies from 'next-cookies';
 import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 
-//Styles-----------------------
+// Styles-----------------------
 
-const HeldenFrame = styled.div`
-  padding: 10px;
-  margin: 10px;
+const PartyButton = styled.button`
+  background: green;
+  color: white;
+  border: none;
   border-radius: 5px;
-  gap: 5px;
+  width: 60px;
+`;
+const BenchButton = styled.button`
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  width: 60px;
+`;
+const DeleteHeldenButton = styled.button`
+  background: red;
+  color: white;
+  border: none;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  justify-self: center;
+`;
+
+const CreateHeldenForm = styled.form`
   background: rgb(48, 39, 223);
   background: linear-gradient(
     180deg,
     rgba(48, 39, 223, 1) 0%,
     rgba(4, 0, 94, 1) 75%
   );
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  padding: 5px;
+  align-items: center;
+  height: 9vw;
   font-family: 'VT323', monospace;
   border: white solid 2px;
+  border-radius: 5px;
   font-size: 1.5em;
-  grid-row: span 2;
+
+  button {
+    grid-column: span 2;
+  }
 `;
 
-const HeldenImage = styled.img`
-  height: 20vh;
-`;
-
-const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: auto auto;
-`;
-
-const Error = styled.div`
-  color: red;
-  margin: 0;
-  display: inline;
+const HeldenButton = styled.button`
+  position: absolute;
+  transform: rotate(-90deg);
+  height: 30px;
+  width: 53px;
+  /* padding-bottom: 3px; */
+  left: -0.525vh;
+  top: ${(props) => props.top}vh;
+  z-index: 1;
+  border: solid 2px white;
+  border-radius: 5px;
+  color: ${(props) => (props.isClicked ? 'white' : 'gray')};
+  background: ${(props) =>
+    props.isClicked ? 'rgba(48, 39, 223, 1) 0%;' : 'black'};
 `;
 
 const HeldenGrid = styled.div`
+  z-index: 0;
   display: grid;
+  position: relative;
   padding: 10px;
   max-width: 70vw;
   margin: 10px;
+  height: 38vw;
   border-radius: 5px;
   gap: 5px;
   background: rgb(48, 39, 223);
@@ -53,13 +87,30 @@ const HeldenGrid = styled.div`
     rgba(48, 39, 223, 1) 0%,
     rgba(4, 0, 94, 1) 75%
   );
+  overflow: scroll;
+
   font-family: 'VT323', monospace;
   border: white solid 2px;
   font-size: 1.5em;
-  grid-row: span 2;
+  grid-row: span 3;
 
   h1 {
-    margin: 10px 5px;
+    padding: 10px 5px;
+    margin: 0;
+    position: sticky;
+    top: -10px;
+    background: rgb(23, 19, 109);
+    border-radius: 5px;
+  }
+
+  h1 + div {
+    padding: 5px 5px;
+    border-radius: 5px;
+    position: sticky;
+    margin-top: 0;
+    gap: 0;
+    top: 25px;
+    background: rgb(23, 19, 109);
   }
 
   div {
@@ -69,11 +120,74 @@ const HeldenGrid = styled.div`
   }
 `;
 
-const HeldenRow = styled.div`
-  background: ${(props) => (props.active ? 'black' : 'transparent')};
+const PartyList = styled.div`
+  display: grid;
+  padding: 10px;
+  width: 70vw;
+  height: 38vw;
+  margin: 10px;
+  border-radius: 5px;
+  gap: 5px;
+  background: rgb(48, 39, 223);
+  background: linear-gradient(
+    180deg,
+    rgba(48, 39, 223, 1) 0%,
+    rgba(4, 0, 94, 1) 75%
+  );
+  font-family: 'VT323', monospace;
+  border: white solid 2px;
+  font-size: 1.5em;
+  grid-row: span 3;
+
+  div {
+    width: 70vw;
+  }
 `;
 
-//Mutations and Queries-----------------------
+const HeldenFrame = styled.div`
+  margin: 5px;
+  /* height: 20vh; */
+  padding: 5px;
+  gap: 5px;
+  border-radius: 5px;
+  background: rgb(48, 39, 223);
+  background: linear-gradient(
+    180deg,
+    rgba(48, 39, 223, 1) 0%,
+    rgba(4, 0, 94, 1) 75%
+  );
+  font-family: 'VT323', monospace;
+  border: white solid 2px;
+  font-size: 1.5em;
+  grid-row: span 2;
+
+  h2 {
+    margin: 0;
+  }
+`;
+
+const HeldenImage = styled.img`
+  height: 10vw;
+`;
+
+const Wrapper = styled.div`
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: 2fr 1fr 1fr;
+`;
+
+const Error = styled.div`
+  color: red;
+  margin: 0;
+  display: inline;
+`;
+
+const HeldenRow = styled.div`
+  background: ${(props) => (props.active ? 'black' : 'transparent')};
+  padding: 5px 5px;
+`;
+
+//  Mutations and Queries-----------------------
 
 const veUpgradeFromItemMutation = gql`
   mutation itemVeUpgrade($heldenId: Int!, $amount: Int) {
@@ -158,15 +272,17 @@ export const heldenListQuery = gql`
   }
 `;
 
-//Component declaration-----------------------
+// Component declaration-----------------------
 
 const HeldenManager = ({ setPrompt }) => {
+  const [isHeldenBoxVisible, setIsHeldenBoxVisible] = useState(true);
+
   const [party, setParty] = useState(new Array(5).fill(null));
   const [active, setActive] = useState(0);
 
   const { register, handleSubmit, errors } = useForm();
 
-  //Component queries-----------------------
+  // Component queries-----------------------
 
   const {
     data: { heldenList: heldenListData },
@@ -174,7 +290,7 @@ const HeldenManager = ({ setPrompt }) => {
     error,
   } = useQuery(heldenListQuery);
 
-  //Component mutations-----------------------
+  // Component mutations-----------------------
 
   const [itemVeUpgrade] = useMutation(veUpgradeFromItemMutation, {
     refetchQueries: [
@@ -240,7 +356,7 @@ const HeldenManager = ({ setPrompt }) => {
     ],
   });
 
-  //Component handlers-----------------------
+  // Component handlers-----------------------
 
   async function onSubmit({ heldenName, className }) {
     const { data } = await createHelden({
@@ -252,7 +368,7 @@ const HeldenManager = ({ setPrompt }) => {
   }
 
   async function upgradeVe(heldenId) {
-    // schema---> mutation itemVeUpgrade($heldenId: Int!, $amount: Int)
+    //  schema---> mutation itemVeUpgrade($heldenId: Int!, $amount: Int)
     const { data } = await itemVeUpgrade({
       variables: { heldenId: heldenId },
     });
@@ -261,7 +377,7 @@ const HeldenManager = ({ setPrompt }) => {
     setPrompt(message);
   }
   async function upgradeAp(heldenId) {
-    // schema---> mutation itemApUpgrade($heldenId: Int!, $amount: Int)
+    //  schema---> mutation itemApUpgrade($heldenId: Int!, $amount: Int)
     const { data } = await itemApUpgrade({
       variables: { heldenId: heldenId },
     });
@@ -319,10 +435,7 @@ const HeldenManager = ({ setPrompt }) => {
     setPrompt(message);
   }
 
-  //Error handling and Render declarations-----------------------
-
-  if (loading) return 'loading...';
-  if (error) return `${error}`;
+  // Error handling and Render declarations-----------------------
 
   const heldenList = [...heldenListData].sort((a, b) =>
     a.name > b.name ? 1 : -1,
@@ -339,77 +452,93 @@ const HeldenManager = ({ setPrompt }) => {
     setParty(partyList);
   }, [heldenListData]);
 
+  if (loading) return 'loading...';
+  if (error) return `${error}`;
+
   return (
     <Wrapper>
-      <HeldenGrid>
-        <h1>HELDEN LIST</h1>
-        <div>
-          <div>NAME</div>
-          <div>CLASS</div>
-          <div>LvL</div>
-          <div>ExS</div>
-          <div>Sa</div>
-          <div>VE</div>
-          <div>AP</div>
-          <div>SD</div>
-          <div>PD</div>
-          <div>STATUS</div>
-        </div>
-        {[...heldenList].map((helden, index) => (
-          <HeldenRow
-            onClick={() => setActive(index)}
-            key={helden.id}
-            active={active === index ? 'active' : ''}
-          >
-            <div>{helden.name}</div>
-            <div>{helden.class.className}</div>
-            <div>{helden.lvl}</div>
-            <div>{helden.exs}</div>
-            <div>{helden.sa}</div>
-            <div>{helden.stats.ve}</div>
-            <div>{helden.stats.ap}</div>
-            <div>{helden.stats.sd}</div>
-            <div>{helden.stats.pd}</div>
-            <div>
-              {helden.partySlot ? (
-                <button onClick={() => removeFromParty(helden.id)}>
-                  PARTY
-                </button>
-              ) : (
-                <button onClick={() => addToParty(helden.id)}>BENCH</button>
-              )}
-            </div>
-            <button onClick={() => deleteHeldenHandler(helden.id)}>X</button>
-          </HeldenRow>
-        ))}
-      </HeldenGrid>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        Helden Name
-        <br />
-        <input
-          name="heldenName"
-          ref={register({ required: true })}
-          type="text"
-        />
-        {errors.heldenName && <Error>---{'>'} ups, this is required</Error>}
-        <br />
-        Class
-        <br />
-        <select
-          name="className"
-          id="classes"
-          ref={register({ required: true })}
-        >
-          <option value="Warrior">Warrior</option>
-          <option value="Healer">Healer</option>
-          <option value="Gunner">Gunner</option>
-          <option value="Mage">Mage</option>
-        </select>
-        {errors.className && <Error>---{'>'} ups, this is required</Error>}
-        <br />
-        <br />
-        <button>Add New Helden</button>
-      </form>
+      <HeldenButton
+        top={32}
+        isClicked={isHeldenBoxVisible}
+        onClick={() => setIsHeldenBoxVisible(true)}
+      >
+        List
+      </HeldenButton>
+      <HeldenButton
+        top={42}
+        isClicked={!isHeldenBoxVisible}
+        onClick={() => setIsHeldenBoxVisible(false)}
+      >
+        Party
+      </HeldenButton>
+      {isHeldenBoxVisible ? (
+        <HeldenGrid>
+          <h1>HELDEN LIST</h1>
+          <div>
+            <div>NAME</div>
+            <div>CLASS</div>
+            <div>LvL</div>
+            <div>ExS</div>
+            <div>Sa</div>
+            <div>VE</div>
+            <div>AP</div>
+            <div>SD</div>
+            <div>PD</div>
+            <div>STATUS</div>
+          </div>
+          {[...heldenList].map((helden, index) => (
+            <HeldenRow
+              onClick={() => setActive(index)}
+              key={helden.id}
+              active={active === index ? 'active' : ''}
+            >
+              <div>{helden.name}</div>
+              <div>{helden.class.className}</div>
+              <div>{helden.lvl}</div>
+              <div>{helden.exs}</div>
+              <div>{helden.sa}</div>
+              <div>{helden.stats.ve}</div>
+              <div>{helden.stats.ap}</div>
+              <div>{helden.stats.sd}</div>
+              <div>{helden.stats.pd}</div>
+              <div>
+                {helden.partySlot ? (
+                  <PartyButton onClick={() => removeFromParty(helden.id)}>
+                    PARTY
+                  </PartyButton>
+                ) : (
+                  <BenchButton onClick={() => addToParty(helden.id)}>
+                    BENCH
+                  </BenchButton>
+                )}
+              </div>
+              <DeleteHeldenButton
+                onClick={() => deleteHeldenHandler(helden.id)}
+              >
+                x
+              </DeleteHeldenButton>
+            </HeldenRow>
+          ))}
+        </HeldenGrid>
+      ) : (
+        <PartyList>
+          <h1>Helden on party</h1>
+          {party.map((helden, index) => {
+            if (helden === null) {
+              return (
+                <div key={index}>{`${
+                  index + 1
+                } - This party Slot is Empty`}</div>
+              );
+            } else {
+              return (
+                <div key={helden.id}>{`${index + 1} - ${helden?.name}`}</div>
+              );
+            }
+          })}
+        </PartyList>
+      )}
+
       <HeldenFrame>
         <h2>{heldenList[active]?.name}</h2>
         <br />
@@ -452,27 +581,36 @@ const HeldenManager = ({ setPrompt }) => {
           </button>
         </div>
       </HeldenFrame>
-      <div>
-        <h1>Helden on party</h1>
-        {party.map((helden, index) => {
-          if (helden === null) {
-            return (
-              <div key={index}>{`${index + 1} - This party Slot is Empty`}</div>
-            );
-          } else {
-            return (
-              <div key={helden.id}>{`${index + 1} - ${helden?.name}`}</div>
-            );
-          }
-        })}
-      </div>
+      <CreateHeldenForm onSubmit={handleSubmit(onSubmit)}>
+        Helden Name
+        <br />
+        <input
+          name="heldenName"
+          ref={register({ required: true })}
+          type="text"
+        />
+        {errors.heldenName && <Error>---{'>'} ups, this is required</Error>}
+        Class
+        <select
+          name="className"
+          id="classes"
+          ref={register({ required: true })}
+        >
+          <option value="Warrior">Warrior</option>
+          <option value="Healer">Healer</option>
+          <option value="Gunner">Gunner</option>
+          <option value="Mage">Mage</option>
+        </select>
+        {errors.className && <Error>---{'>'} ups, this is required</Error>}
+        <button>Add New Helden</button>
+      </CreateHeldenForm>
     </Wrapper>
   );
 };
 
 export default HeldenManager;
 
-//SSP function----------------------
+// SSP function----------------------
 
 export async function getServerSideProps(context) {
   const apolloClient = initializeApollo(null, context);
