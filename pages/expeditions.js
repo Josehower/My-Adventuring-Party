@@ -20,6 +20,49 @@ const Select = styled.select`
   background: ${(props) => (props.activeExpAmount > 4 ? 'gray' : 'white')};
 `;
 
+const Form = styled.form`
+  display: grid;
+  gap: 10px;
+  margin: 0 auto;
+  width: 70vw;
+  grid-template-columns: repeat(2, 1fr);
+  grid-column: span 5;
+
+  button {
+    border-radius: 5px;
+    gap: 5px;
+    border: white solid 2px;
+
+    &:hover {
+      background: gray;
+      color: white;
+    }
+  }
+
+  select {
+    background: linear-gradient(
+      180deg,
+      rgba(48, 39, 223, 1) 0%,
+      rgba(4, 0, 94, 1) 75%
+    );
+    color: white;
+    font-family: 'VT323', monospace;
+    font-size: 1.5rem;
+    border-radius: 5px;
+    gap: 5px;
+    border: white solid 2px;
+
+    option {
+      background: #3027df;
+      /*   background: linear-gradient(
+        180deg,
+        rgba(48, 39, 223, 1) 0%,
+        rgba(4, 0, 94, 1) 75%
+      ); */
+    }
+  }
+`;
+
 const SubmitButton = styled.button`
   cursor: ${(props) => (props.activeExpAmount > 4 ? 'not-allowed' : 'pointer')};
   background: ${(props) => (props.activeExpAmount > 4 ? 'gray' : 'white')};
@@ -118,7 +161,7 @@ const Store = (props) => {
         refetch={refetch}
         slot={4}
       />
-      <form
+      <Form
         activeExpAmount={data.expeditionList.length}
         onSubmit={handleSubmit(onSubmit)}
       >
@@ -148,7 +191,7 @@ const Store = (props) => {
         >
           Send to Expedition
         </SubmitButton>
-      </form>
+      </Form>
     </CardWrapper>
   );
 };

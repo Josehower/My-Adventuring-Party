@@ -47,8 +47,14 @@ export async function createGameInstance() {
 export async function getPlayerMoneyById(gameId) {
   //TODO: rename to getPlayerMoneyByGameId
   const money = await sql`
-    SELECT players.nick_name, purse.gold, purse.soul_stones , barrel.last_hit
-      FROM game_instance as game
+    SELECT 
+      players.nick_name,
+      players.player_name,
+      players.e_mail,
+      purse.gold, 
+      purse.soul_stones, 
+      barrel.last_hit
+    FROM game_instance as game
       JOIN player_purse as purse
         ON purse.purse_id = game.game_id
       JOIN players

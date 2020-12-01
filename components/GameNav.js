@@ -28,6 +28,7 @@ const NavLink = styled.a`
   line-height: -20px;
   margin: -10px;
   cursor: pointer;
+  user-select: none;
 
   &:hover {
     text-decoration: underline;

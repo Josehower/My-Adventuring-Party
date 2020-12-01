@@ -76,6 +76,7 @@ const HeldenGrid = styled.div`
   display: grid;
   position: relative;
   padding: 10px;
+  align-content: start;
   max-width: 70vw;
   margin: 10px;
   height: 38vw;
@@ -87,7 +88,7 @@ const HeldenGrid = styled.div`
     rgba(48, 39, 223, 1) 0%,
     rgba(4, 0, 94, 1) 75%
   );
-  overflow: scroll;
+  overflow: auto;
 
   font-family: 'VT323', monospace;
   border: white solid 2px;
@@ -97,6 +98,7 @@ const HeldenGrid = styled.div`
   h1 {
     padding: 10px 5px;
     margin: 0;
+    max-height: 100px;
     position: sticky;
     top: -10px;
     background: rgb(23, 19, 109);
@@ -115,7 +117,8 @@ const HeldenGrid = styled.div`
 
   div {
     display: grid;
-    grid-template-columns: 2fr repeat(10, 1fr);
+    max-height: 60px;
+    grid-template-columns: 2fr repeat(9, 1fr) 0.3fr;
     margin-bottom: 5px;
   }
 `;
@@ -123,7 +126,6 @@ const HeldenGrid = styled.div`
 const PartyList = styled.div`
   display: grid;
   padding: 10px;
-  width: 70vw;
   height: 38vw;
   margin: 10px;
   border-radius: 5px;
@@ -136,19 +138,33 @@ const PartyList = styled.div`
   );
   font-family: 'VT323', monospace;
   border: white solid 2px;
-  font-size: 1.5em;
+  font-size: 2em;
   grid-row: span 3;
 
-  div {
-    width: 70vw;
+  > div {
+    align-self: center;
+    justify-self: center;
+    width: 50vw;
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    padding: 5px;
+    margin: 0;
+    gap: 3px;
+  }
+
+  h1 {
+    grid-column: span 2;
+    text-align: center;
   }
 `;
 
 const HeldenFrame = styled.div`
-  margin: 5px;
-  /* height: 20vh; */
+  display: grid;
+  justify-items: center;
+  margin: 5px 0;
   padding: 5px;
-  gap: 5px;
+  gap: 10px;
   border-radius: 5px;
   background: rgb(48, 39, 223);
   background: linear-gradient(
@@ -161,9 +177,26 @@ const HeldenFrame = styled.div`
   font-size: 1.5em;
   grid-row: span 2;
 
+  button {
+    margin-left: 10px;
+    background: transparent;
+    color: white;
+    border: solid 2px transparent;
+    border-radius: 5px;
+
+    &:hover {
+      border: solid 2px white;
+    }
+  }
+
   h2 {
     margin: 0;
   }
+`;
+const StatDiv = styled.div`
+  justify-self: stretch;
+  display: flex;
+  justify-content: space-around;
 `;
 
 const HeldenImage = styled.img`
@@ -185,6 +218,7 @@ const Error = styled.div`
 const HeldenRow = styled.div`
   background: ${(props) => (props.active ? 'black' : 'transparent')};
   padding: 5px 5px;
+  cursor: pointer;
 `;
 
 //  Mutations and Queries-----------------------
@@ -532,7 +566,12 @@ const HeldenManager = ({ setPrompt }) => {
               );
             } else {
               return (
-                <div key={helden.id}>{`${index + 1} - ${helden?.name}`}</div>
+                <div key={helden.id}>
+                  <div>
+                    {index + 1} - {helden?.name}
+                  </div>
+                  <div> {`${helden.class.className} - lvl: ${helden.lvl}`}</div>
+                </div>
               );
             }
           })}
@@ -541,7 +580,6 @@ const HeldenManager = ({ setPrompt }) => {
 
       <HeldenFrame>
         <h2>{heldenList[active]?.name}</h2>
-        <br />
         {heldenList[active] ? (
           <HeldenImage
             src={`/helden${heldenList[active]?.class.classImg}`}
@@ -556,30 +594,30 @@ const HeldenManager = ({ setPrompt }) => {
         </div>
         <div>ExS - {heldenList[active]?.exs}</div>
         <div>Sa - {heldenList[active]?.sa}</div>
-        <div>
+        <StatDiv>
           VE - {heldenList[active]?.stats.ve}
           <button onClick={() => upgradeVe(heldenList[active].id)}>
             upgrade
           </button>
-        </div>
-        <div>
+        </StatDiv>
+        <StatDiv>
           AP - {heldenList[active]?.stats.ap}{' '}
           <button onClick={() => upgradeAp(heldenList[active].id)}>
             upgrade
           </button>
-        </div>
-        <div>
+        </StatDiv>
+        <StatDiv>
           SD - {heldenList[active]?.stats.sd}{' '}
           <button onClick={() => upgradeSd(heldenList[active].id)}>
             upgrade
           </button>
-        </div>
-        <div>
+        </StatDiv>
+        <StatDiv>
           PD - {heldenList[active]?.stats.pd}{' '}
           <button onClick={() => upgradePd(heldenList[active].id)}>
             upgrade
           </button>
-        </div>
+        </StatDiv>
       </HeldenFrame>
       <CreateHeldenForm onSubmit={handleSubmit(onSubmit)}>
         Helden Name

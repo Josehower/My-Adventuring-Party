@@ -5,7 +5,7 @@ import { bagQuery } from './PlayerBag';
 
 const ItemGrid = styled.div`
   display: grid;
-  max-width: 60vw;
+  width: 80vw;
   padding: 5px;
   grid-template-columns: 1fr 1fr;
   margin: 10px;
@@ -39,12 +39,12 @@ const ItemGrid = styled.div`
 
     div {
       padding: 5px;
-      max-width: 45vw;
       background: none;
       &:hover {
         background: none;
       }
     }
+
     button {
       background: none;
       color: white;

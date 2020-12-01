@@ -4,13 +4,20 @@ import PlayerBag, { bagQuery } from '../components/PlayerBag';
 import { isSessionTokenValid } from '../utils/auth';
 import nextCookies from 'next-cookies';
 import MariosStore, { getStoreQuerry } from '../components/MariosStore';
+import styled from 'styled-components';
+
+const StoreWarpper = styled.div`
+  margin: 0 auto;
+  display: grid;
+  justify-content: center;
+`;
 
 const store = ({ setPrompt }) => {
   return (
-    <div>
+    <StoreWarpper>
       <MariosStore messageSetter={setPrompt} />
       <PlayerBag messageSetter={setPrompt} />
-    </div>
+    </StoreWarpper>
   );
 };
 

@@ -23,6 +23,7 @@ const Wrapper = styled.div`
   background: #010142;
   color: white;
   margin-bottom: 1vh;
+  user-select: none;
 
   h1 {
     font-family: 'VT323', monospace;

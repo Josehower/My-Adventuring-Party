@@ -9,6 +9,7 @@ import Head from 'next/head';
 
 const Prompt = styled.div`
   background: rgb(48, 39, 223);
+  user-select: none;
   background: linear-gradient(
     180deg,
     rgba(48, 39, 223, 1) 0%,

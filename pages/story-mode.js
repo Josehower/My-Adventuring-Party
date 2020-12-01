@@ -10,6 +10,7 @@ import { gql, useMutation } from '@apollo/client';
 import { pause } from '../utils/timer';
 import { klona } from 'klona';
 import VictoryFrame from '../components/VictoryFrame';
+import DefeatFrame from '../components/DefeatFrame';
 
 const CombatFrame = styled.div`
   display: grid;
@@ -25,6 +26,7 @@ const CombatFrame = styled.div`
   width: 90vw;
   margin: 0 auto;
   border-radius: 5px;
+  user-select: none;
 
   h1 {
     grid-column: span 2;
@@ -109,6 +111,14 @@ const SubmitButton = styled.button`
   &:focus {
     outline: 0;
     border: #dddddd 2px solid;
+  }
+`;
+
+const deleteCombatMutation = gql`
+  mutation deleteCombat {
+    deleteCombat {
+      message
+    }
   }
 `;
 
@@ -260,6 +270,7 @@ const StoryMode = (props) => {
 
   const [updateCombat] = useMutation(updateCombatMutation);
   const [initCombat] = useMutation(initCombatMutation);
+  const [deleteCombat] = useMutation(deleteCombatMutation);
 
   const enemyTeamVitalEnergy = clientData?.enemyTeam?.reduce((acc, enemy) => {
     return enemy.instanceVe + acc;
@@ -517,6 +528,28 @@ const StoryMode = (props) => {
     setChangesQueve(renderActionList);
   }
 
+  useEffect(async () => {
+    if (
+      combatDefinition === 'battleOn' &&
+      enemyTeamVitalEnergy === 0 &&
+      playerTeamVitalEnergy === 0
+    ) {
+      const { data } = await deleteCombat();
+      console.log(data.deleteCombat);
+      setCombatDefinition('');
+    }
+    if (combatDefinition === 'battleOn' && playerTeamVitalEnergy === 0) {
+      const { data } = await deleteCombat();
+      console.log(data.deleteCombat);
+      setCombatDefinition('');
+    }
+    if (combatDefinition === 'battleOn' && enemyTeamVitalEnergy === 0) {
+      const { data } = await deleteCombat();
+      console.log(data.deleteCombat);
+      setCombatDefinition('');
+    }
+  }, [combatDefinition]);
+
   useEffect(() => {
     const timeout = setTimeout(async () => {
       if (stateChangesQueve.length > 0) {
@@ -586,7 +619,7 @@ const StoryMode = (props) => {
   }
   if (combatDefinition === 'defeat') {
     // return 'DEFEAT';
-    return <VictoryFrame definition={setCombatDefinition} />;
+    return <DefeatFrame definition={setCombatDefinition} />;
   }
   if (combatDefinition === 'victory') {
     return <VictoryFrame definition={setCombatDefinition} />;

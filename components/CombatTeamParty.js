@@ -134,6 +134,7 @@ const CharacterName = styled.h2`
 const TeamFrame = styled.div`
   background-color: rgba(53, 37, 0, 0.4);
   padding: 10px;
+  user-select: none;
 `;
 
 const InfoWrapper = styled.div`
@@ -170,6 +171,10 @@ const ActionSelect = styled.select`
   cursor: pointer;
   ${(props) =>
     props.isActive !== 'party' ? 'background: gray; pointer-events: none;' : ''}
+
+  option {
+    background: #3027df;
+  }
 `;
 
 const TargetSelect = styled.select`

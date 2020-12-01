@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const ItemGrid = styled.div`
   display: grid;
-  max-width: 60vw;
+  width: 80vw;
   padding: 5px;
   grid-template-columns: 1fr 1fr;
   margin: 10px;
@@ -71,7 +71,7 @@ export const bagQuery = gql`
   }
 `;
 
-const PlayerBag = ({ messageSetter = console.log }) => {
+const PlayerBag = ({ messageSetter = console.log, className }) => {
   const { data, loading, error } = useQuery(bagQuery);
 
   if (loading) return 'loading...';
@@ -80,28 +80,27 @@ const PlayerBag = ({ messageSetter = console.log }) => {
   const sortedBag = [...data.playerBag].sort((a, b) => a.itemId - b.itemId);
 
   return (
-    <div>
-      <ItemGrid
-        onMouseLeave={() =>
-          messageSetter('Welcome to my adventuring party. Explore!')
-        }
-      >
-        <h1>Your Bag</h1>
-        {sortedBag.map((item) => {
-          return (
-            <div
-              key={item.itemId + 'container'}
-              onMouseEnter={() =>
-                messageSetter(`${item.name.toUpperCase()}: ${item.description}`)
-              }
-            >
-              <Name key={item.itemId + 'name'}>{item.name}</Name>
-              <Qty key={item.itemId + 'qty'}>{item.qty}</Qty>
-            </div>
-          );
-        })}
-      </ItemGrid>
-    </div>
+    <ItemGrid
+      className={className}
+      onMouseLeave={() =>
+        messageSetter('Welcome to my adventuring party. Explore!')
+      }
+    >
+      <h1>Your Bag</h1>
+      {sortedBag.map((item) => {
+        return (
+          <div
+            key={item.itemId + 'container'}
+            onMouseEnter={() =>
+              messageSetter(`${item.name.toUpperCase()}: ${item.description}`)
+            }
+          >
+            <Name key={item.itemId + 'name'}>{item.name}</Name>
+            <Qty key={item.itemId + 'qty'}>{item.qty}</Qty>
+          </div>
+        );
+      })}
+    </ItemGrid>
   );
 };
 

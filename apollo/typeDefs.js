@@ -174,6 +174,8 @@ const typeDefs = gql`
     gold: Int
     soulStones: Int
     lastHit: String
+    playerName: String
+    eMail: String
   }
   type Player {
     playerId: Int
