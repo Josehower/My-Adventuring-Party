@@ -1,6 +1,6 @@
 https://github.com/thorinaboenke/cheatsheets
 
-
+redeploy trigger
 select * from players;
 
 
