@@ -15,3 +15,10 @@
 - debe haber una forma de escapar de la batalla
 - debe repararse la visualizacion temporizador de expedition
 - solo se puede hacer upgrade si se tienen jenas roundend baked o marions special brew
+
+
+
+- Revisar por no nombres de helden repetidos
+- solucionar problema de cambiar el party estando en battalla
+- no poder agregar en expedicion a helden en party
+- no poder agregar helden a party si estan en expedition
