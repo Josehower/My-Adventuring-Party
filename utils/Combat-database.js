@@ -1,8 +1,8 @@
-import dotenv from 'dotenv';
 import camelcaseKeys from 'camelcase-keys';
+import dotenv from 'dotenv';
 import { sql } from './account-database';
-import { getHeldenListByGameId } from './helden-database';
 import { testEncounter } from './encounterList';
+import { getHeldenListByGameId } from './helden-database';
 import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
 
 setPostgresDefaultsOnHeroku();

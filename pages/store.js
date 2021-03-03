@@ -1,10 +1,11 @@
+import { gql } from '@apollo/client';
+import nextCookies from 'next-cookies';
 import React from 'react';
+import styled from 'styled-components';
 import { initializeApollo } from '../apollo/client';
+import MariosStore, { getStoreQuerry } from '../components/MariosStore';
 import PlayerBag, { bagQuery } from '../components/PlayerBag';
 import { isSessionTokenValid } from '../utils/auth';
-import nextCookies from 'next-cookies';
-import MariosStore, { getStoreQuerry } from '../components/MariosStore';
-import styled from 'styled-components';
 
 const StoreWarpper = styled.div`
   margin: 0 auto;
@@ -29,7 +30,26 @@ export async function getServerSideProps(context) {
   const { session: token } = nextCookies(context);
   const loggedIn = await isSessionTokenValid(token);
 
-  if (!(await isSessionTokenValid(token))) {
+  const {
+    data: { isCombatActive },
+  } = await apolloClient.query({
+    query: gql`
+      query {
+        isCombatActive
+      }
+    `,
+  });
+
+  if (isCombatActive) {
+    return {
+      redirect: {
+        destination: '/story-mode',
+        permanent: false,
+      },
+    };
+  }
+
+  if (!(await loggedIn)) {
     return {
       redirect: {
         destination: '/login',

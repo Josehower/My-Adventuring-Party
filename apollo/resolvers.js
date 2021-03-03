@@ -1,11 +1,11 @@
 import { login } from '../lib/login';
 import { createNewPlayer } from '../lib/player';
-import { isThisCallAllowed, getGameIdFromContext } from '../utils/auth';
+import { getGameIdFromContext, isThisCallAllowed } from '../utils/auth';
 import {
   deleteCombatInstance,
   initializeCombat,
-  updateCombat,
   isCombatInstanceOn,
+  updateCombat,
 } from '../utils/Combat-database';
 import {
   createExpeditionByHeldenId,
@@ -13,22 +13,22 @@ import {
   getHeldenExpeditionTimeLeft,
 } from '../utils/expedition-database';
 import {
+  buyItemByGameId,
+  getPlayerBagByGameId,
   getPlayerMoneyById,
   getStoreByGameId,
   hitTheBarrelByGameId,
-  buyItemByGameId,
-  getPlayerBagByGameId,
 } from '../utils/game-database';
 import {
   createHelden,
   deleteHeldenById,
   getHeldenListByGameId,
-  heldenToParty,
   heldenToBench,
-  upgradeHeldenVeById,
+  heldenToParty,
   upgradeHeldenApById,
   upgradeHeldenPdById,
   upgradeHeldenSdById,
+  upgradeHeldenVeById,
 } from '../utils/helden-database';
 
 const resolvers = {

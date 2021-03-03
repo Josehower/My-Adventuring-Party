@@ -1,11 +1,11 @@
-import { useForm } from 'react-hook-form';
+import { gql, useMutation } from '@apollo/client';
 import nextCookies from 'next-cookies';
-import { isSessionTokenValid } from '../utils/auth';
-import { useRouter } from 'next/router';
-import styled from 'styled-components';
-import { useState } from 'react';
 import Link from 'next/link';
-import { useMutation, gql } from '@apollo/client';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import styled from 'styled-components';
+import { isSessionTokenValid } from '../utils/auth';
 
 const RegisterLink = styled.a`
   color: white;
@@ -66,7 +66,6 @@ const login = (props) => {
       playerName
       <br />
       <input
-        // value="heggart"
         name="playerName"
         ref={register({ required: true })}
         type="text"
@@ -76,7 +75,6 @@ const login = (props) => {
       password
       <br />
       <input
-        // value="123abc123"
         name="password"
         ref={register({ required: true })}
         type="password"

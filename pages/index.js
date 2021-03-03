@@ -1,10 +1,10 @@
-import { isSessionTokenValid } from '../utils/auth';
+import { gql, useQuery } from '@apollo/client';
 import nextCookies from 'next-cookies';
-import { getGameByToken } from '../utils/account-database';
+import styled from 'styled-components';
 import { initializeApollo } from '../apollo/client';
 import PlayerBag, { bagQuery } from '../components/PlayerBag';
-import styled from 'styled-components';
-import { gql, useQuery } from '@apollo/client';
+import { getGameByToken } from '../utils/account-database';
+import { isSessionTokenValid } from '../utils/auth';
 
 const HomeWrapper = styled.div`
   display: grid;
@@ -94,7 +94,26 @@ export async function getServerSideProps(context) {
   const { session: token } = nextCookies(context);
   const loggedIn = await isSessionTokenValid(token);
 
-  if (!(await isSessionTokenValid(token))) {
+  const {
+    data: { isCombatActive },
+  } = await apolloClient.query({
+    query: gql`
+      query {
+        isCombatActive
+      }
+    `,
+  });
+
+  if (isCombatActive) {
+    return {
+      redirect: {
+        destination: '/story-mode',
+        permanent: false,
+      },
+    };
+  }
+
+  if (!(await loggedIn)) {
     return {
       redirect: {
         destination: '/login',

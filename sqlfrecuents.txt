@@ -1,6 +1,10 @@
 https://github.com/thorinaboenke/cheatsheets
 
 redeploy trigger
+
+ psql username dbname
+ ask=> username pw
+
 select * from players;
 
 

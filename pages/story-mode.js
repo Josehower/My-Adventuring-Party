@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { initializeApollo } from '../apollo/client';
-import { isSessionTokenValid } from '../utils/auth';
-import nextCookies from 'next-cookies';
-import styled, { keyframes } from 'styled-components';
-import { useForm } from 'react-hook-form';
-import CombatTeamParty from '../components/CombatTeamParty';
-import CombatEnemyTeam from '../components/CombatEnemyTeam';
-import { gql, useMutation } from '@apollo/client';
-import { pause } from '../utils/timer';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { klona } from 'klona';
-import VictoryFrame from '../components/VictoryFrame';
+import nextCookies from 'next-cookies';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import styled, { keyframes } from 'styled-components';
+import { initializeApollo } from '../apollo/client';
+import CombatEnemyTeam from '../components/CombatEnemyTeam';
+import CombatTeamParty from '../components/CombatTeamParty';
 import DefeatFrame from '../components/DefeatFrame';
+import VictoryFrame from '../components/VictoryFrame';
+import { isSessionTokenValid } from '../utils/auth';
+import { pause } from '../utils/timer';
+import { heldenListQuery } from './helden';
 
 const CombatFrame = styled.div`
   display: grid;
@@ -282,7 +283,21 @@ const StoryMode = (props) => {
     0,
   );
 
+  const {
+    data: { heldenList: heldenListData },
+    loading: heldenListLoading,
+    error,
+  } = useQuery(heldenListQuery);
+
   async function startCombat() {
+    if (heldenListLoading) return;
+    if (!heldenListData.some((helden) => helden.partySlot !== null)) {
+      props.setPrompt(
+        'WAIT! you need at least one Helden on the party to do this',
+      );
+      // alert('you need at least one Helden to do this');
+      return;
+    }
     const { data } = await initCombat();
     setClientData(data.initCombat);
     setInitialState(klona(data.initCombat));
@@ -599,7 +614,9 @@ const StoryMode = (props) => {
   }, [clientData]);
 
   useEffect(() => {
-    console.log(props.isCombatActive);
+    props.setPrompt(
+      'Wow... something is happening on the forest!, you should take a look',
+    );
     if (props.isCombatActive) {
       startCombat();
     }
@@ -656,10 +673,6 @@ const StoryMode = (props) => {
     );
   }
 
-  props.setPrompt(
-    'Wow... something is happening on the forest!, you should take a look',
-  );
-
   return (
     <MapFrame>
       <BattleButton onClick={startCombat}>
@@ -685,6 +698,11 @@ export async function getServerSideProps(context) {
       },
     };
   }
+
+  await apolloClient.query({
+    query: heldenListQuery,
+  });
+
   const {
     data: { isCombatActive },
   } = await apolloClient.query({
