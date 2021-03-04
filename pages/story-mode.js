@@ -298,6 +298,7 @@ const StoryMode = (props) => {
       // alert('you need at least one Helden to do this');
       return;
     }
+    await deleteCombat();
     const { data } = await initCombat();
     setClientData(data.initCombat);
     setInitialState(klona(data.initCombat));
@@ -618,6 +619,7 @@ const StoryMode = (props) => {
       'Wow... something is happening on the forest!, you should take a look',
     );
     if (props.isCombatActive) {
+    
       startCombat();
     }
   }, []);
@@ -712,6 +714,7 @@ export async function getServerSideProps(context) {
       }
     `,
   });
+
 
   return {
     props: {

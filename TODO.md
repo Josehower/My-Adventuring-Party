@@ -1,0 +1,4 @@
+- Revisar por no nombres de helden repetidos
+- solucionar problema de cambiar el party estando en battalla
+- no poder agregar en expedicion a helden en party
+- no poder agregar helden a party si estan en expedition

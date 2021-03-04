@@ -51,8 +51,8 @@ const GoldContainer = ({ setPrompt = console.log, isPlayerLogged }) => {
   const [barrelAmount, setBarrelAmount] = useState(0);
   const [lastBarrelHit, setLastBarrelHit] = useState(+Date.now());
 
-  if (money && money?.playerMoney.lastHit !== lastBarrelHit) {
-    setLastBarrelHit(money?.playerMoney.lastHit);
+  if (money && money?.playerMoney?.lastHit !== lastBarrelHit) {
+    setLastBarrelHit(money?.playerMoney?.lastHit);
   }
 
   function updateBarrel() {
@@ -99,9 +99,9 @@ const GoldContainer = ({ setPrompt = console.log, isPlayerLogged }) => {
         <GoldButton onClick={() => hitBarrel()}>hitMe</GoldButton>
         barrel: ${barrelAmount}
       </div>
-      <div>gold: $ {money?.playerMoney.gold} </div>
-      <div>soul stones: § {money?.playerMoney.soulStones}</div>
-      <div>Player: {money?.playerMoney.nickName}</div>
+      <div>gold: $ {money?.playerMoney?.gold} </div>
+      <div>soul stones: § {money?.playerMoney?.soulStones}</div>
+      <div>Player: {money?.playerMoney?.nickName}</div>
     </MoneyWrapper>
   );
 };

@@ -28,6 +28,6 @@ export async function isThisCallAllowed(context) {
 
 export async function getGameIdFromContext(ctx) {
   const { session: token } = nextCookies(ctx);
-  const { gameId } = await getGameByToken(token);
-  return gameId;
+  const gameObj = await getGameByToken(token);
+  return gameObj?.gameId;
 }

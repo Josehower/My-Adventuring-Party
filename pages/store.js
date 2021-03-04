@@ -30,6 +30,16 @@ export async function getServerSideProps(context) {
   const { session: token } = nextCookies(context);
   const loggedIn = await isSessionTokenValid(token);
 
+  if (!(await loggedIn)) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
+
   const {
     data: { isCombatActive },
   } = await apolloClient.query({
@@ -49,14 +59,6 @@ export async function getServerSideProps(context) {
     };
   }
 
-  if (!(await loggedIn)) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
 
   await apolloClient.query({
     query: bagQuery,

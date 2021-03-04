@@ -7,11 +7,8 @@
 
 # desiciones de diseno
 
-- debe haber un estado battle on.
-- si se abandona la batalla la batalla se reinicia.
 - helden en party no pueden ser enviados a expeditcion
 - helden en expedition no pueden ser anadidos al party.
-- si la batalla lleva mas de 24 horas se da como perdida.
 - debe haber una forma de escapar de la batalla
 - debe repararse la visualizacion temporizador de expedition
 - solo se puede hacer upgrade si se tienen jenas roundend baked o marions special brew
@@ -19,6 +16,7 @@
 
 
 - Revisar por no nombres de helden repetidos
-- solucionar problema de cambiar el party estando en battalla
 - no poder agregar en expedicion a helden en party
 - no poder agregar helden a party si estan en expedition
+- resolver problema de recargar en frame de victoria o derrota
+- en reload deberia preguntar si esta seguro
