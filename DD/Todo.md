@@ -1,9 +1,3 @@
-# known issues
-- send to expedition with no helden breaks the app
-- expedition time go up again after changing pages
-   - after 2 minutes it go down to 2:39 and go up again
-   - after the first expedition the times go down to 1
-   - some way the temp is working just the numbers displayed
 
 # desiciones de diseno
 

@@ -332,8 +332,13 @@ const HeldenManager = ({ setPrompt }) => {
 
   // Component queries-----------------------
 
-  const { data: {expeditionList}, _loading, _error, refetch } = useQuery(expeditionListQuery);
-console.log("expe", expeditionList)
+  const {
+    data: { expeditionList },
+    _loading,
+    _error,
+    refetch,
+  } = useQuery(expeditionListQuery);
+  console.log('expe', expeditionList);
   const {
     data: { heldenList: heldenListData },
     loading,
@@ -552,7 +557,11 @@ console.log("expe", expeditionList)
               <div>{helden.stats.sd}</div>
               <div>{helden.stats.pd}</div>
               <div>
-{expeditionList.some(({heldenId})=> heldenId === helden.id) ? <div>expe</div> :                helden.partySlot ? (
+                {expeditionList.some(
+                  ({ heldenId }) => heldenId === helden.id,
+                ) ? (
+                  <div>expe</div>
+                ) : helden.partySlot ? (
                   <PartyButton onClick={() => removeFromParty(helden.id)}>
                     PARTY
                   </PartyButton>
@@ -561,7 +570,6 @@ console.log("expe", expeditionList)
                     BENCH
                   </BenchButton>
                 )}
-
               </div>
               <DeleteHeldenButton
                 onClick={() => deleteHeldenHandler(helden.id)}
@@ -691,7 +699,7 @@ export async function getServerSideProps(context) {
       }
     `,
   });
-  
+
   if (isCombatActive) {
     return {
       redirect: {
@@ -703,7 +711,6 @@ export async function getServerSideProps(context) {
   await apolloClient.query({
     query: heldenListQuery,
   });
-
 
   await apolloClient.query({
     query: expeditionListQuery,

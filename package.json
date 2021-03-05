@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@apollo/client": "^3.2.5",
-    "@apollo/react-ssr": "^4.0.0",
     "apollo-server-micro": "^2.19.0",
     "argon2": "^0.27.0",
     "camelcase-keys": "^6.2.2",
@@ -32,19 +31,26 @@
     "styled-components": "^5.2.1"
   },
   "devDependencies": {
-    "@upleveled/eslint-config-upleveled": "1.2.2",
-    "babel-eslint": "^10.0.0",
-    "eslint": "^7.5.0",
+    "@types/node": "14.14.30",
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.1",
+    "@typescript-eslint/eslint-plugin": "4.15.1",
+    "@typescript-eslint/parser": "4.15.1",
+    "@upleveled/eslint-config-upleveled": "1.7.2",
+    "babel-eslint": "10.1.0",
+    "eslint": "7.20.0",
     "eslint-config-react-app": "6.0.0",
+    "eslint-import-resolver-typescript": "2.4.0",
     "eslint-plugin-cypress": "2.11.2",
-    "eslint-plugin-flowtype": "^5.2.0",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-jest": "^24.0.0",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.20.3",
-    "eslint-plugin-react-hooks": "^4.0.8",
-    "eslint-plugin-testing-library": "^3.9.0",
-    "typescript": "4.1.2"
+    "eslint-plugin-flowtype": "5.2.2",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-jest": "24.1.5",
+    "eslint-plugin-jsx-a11y": "6.4.1",
+    "eslint-plugin-react": "7.22.0",
+    "eslint-plugin-react-hooks": "4.2.0",
+    "eslint-plugin-testing-library": "3.10.1",
+    "eslint-plugin-unicorn": "28.0.2",
+    "typescript": "4.1.5"
   },
   "cacheDirectories": [
     ".next/cache"

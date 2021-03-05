@@ -45,13 +45,13 @@ const DefeatFrame = (props) => {
     props.definition('');
   }
 
-  useEffect(()=>{
-    async function reset(){
+  useEffect(() => {
+    async function reset() {
       const { data } = await deleteCombat();
       console.log(data.deleteCombat);
-    };
-    reset()
-      },[])
+    }
+    reset();
+  }, []);
 
   return (
     <Frame>

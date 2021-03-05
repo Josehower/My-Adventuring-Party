@@ -619,7 +619,6 @@ const StoryMode = (props) => {
       'Wow... something is happening on the forest!, you should take a look',
     );
     if (props.isCombatActive) {
-    
       startCombat();
     }
   }, []);
@@ -671,7 +670,7 @@ const StoryMode = (props) => {
         <SubmitButton styleCode={combatStep} onClick={handleSubmit(hit)}>
           {teamPriority[combatStep]} Go!
         </SubmitButton>
-        <button onClick={()=>setCombatDefinition("defeat")}>click</button>
+        <button onClick={() => setCombatDefinition('defeat')}>click</button>
       </CombatFrame>
     );
   }
@@ -715,7 +714,6 @@ export async function getServerSideProps(context) {
       }
     `,
   });
-
 
   return {
     props: {

@@ -109,8 +109,8 @@ const Store = (props) => {
   const { register, handleSubmit, errors } = useForm();
 
   async function onSubmit(submitData) {
-   if (submitData.heldenToExpedition === "off" ) return
-  
+    if (submitData.heldenToExpedition === 'off') return;
+
     if (data.expeditionList.length > 4) {
       return;
     }
@@ -124,46 +124,29 @@ const Store = (props) => {
     });
 
     props.setPrompt(message);
-
+    console.log(data);
     refetch();
   }
-
 
   if (loading || heldenLoading) return <p>loading...</p>;
   if (error || heldenError) return `${error}`;
 
   return (
     <CardWrapper>
-      <HeldenExpeditionCard
-        data={data}
-        heldenListData={heldenListData}
-        refetch={refetch}
-        slot={0}
-      />
-      <HeldenExpeditionCard
-        data={data}
-        heldenListData={heldenListData}
-        refetch={refetch}
-        slot={1}
-      />
-      <HeldenExpeditionCard
-        data={data}
-        heldenListData={heldenListData}
-        refetch={refetch}
-        slot={2}
-      />
-      <HeldenExpeditionCard
-        data={data}
-        heldenListData={heldenListData}
-        refetch={refetch}
-        slot={3}
-      />
-      <HeldenExpeditionCard
-        data={data}
-        heldenListData={heldenListData}
-        refetch={refetch}
-        slot={4}
-      />
+      {new Array(5)
+        .fill(undefined)
+        .map((_s, i) => data.expeditionList[i])
+        .sort((a, b) => a.expeditionStartDate - b.expeditionStartDate)
+        .map((expedition, index) => {
+          return (
+            <HeldenExpeditionCard
+              expedition={expedition}
+              refetch={refetch}
+              index={index}
+            />
+          );
+        })}
+
       <Form
         activeExpAmount={data.expeditionList.length}
         onSubmit={handleSubmit(onSubmit)}
@@ -174,9 +157,9 @@ const Store = (props) => {
           ref={register({ required: true })}
           activeExpAmount={data.expeditionList.length}
         >
-          <option value={"off"}>Select Free Helden</option>
+          <option value={'off'}>Select Free Helden</option>
           {heldenListData
-            .filter(helden=>helden.partySlot=== null)
+            .filter((helden) => helden.partySlot === null)
             .filter((helden) => {
               const idsOnExpeditionList = data.expeditionList.map(
                 (heldenOnExp) => heldenOnExp.heldenId,
@@ -236,8 +219,6 @@ export async function getServerSideProps(context) {
       },
     };
   }
-
-
 
   await apolloClient.query({
     query: expeditionListQuery,

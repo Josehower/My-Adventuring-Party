@@ -1,5 +1,5 @@
-import dotenv from 'dotenv';
 import camelcaseKeys from 'camelcase-keys';
+import dotenv from 'dotenv';
 import { sql } from './account-database';
 import { getGameByHeldenId, levelUp } from './helden-database';
 import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
@@ -254,8 +254,6 @@ export async function getHeldenExpeditionEndTime(heldenId) {
     await sql`DELETE FROM expedition WHERE expedition_id = ${expeditionId} `;
     return false;
   }
-
-
 
   return +endTime;
 }

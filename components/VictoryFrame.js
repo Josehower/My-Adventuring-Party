@@ -47,14 +47,13 @@ const VictoryFrame = (props) => {
     console.log(data.deleteCombat);
   }
 
-  useEffect(()=>{
-    async function reset(){
+  useEffect(() => {
+    async function reset() {
       const { data } = await deleteCombat();
       console.log(data.deleteCombat);
-    };
-    reset()
-      },[])
-
+    }
+    reset();
+  }, []);
 
   return (
     <Frame>

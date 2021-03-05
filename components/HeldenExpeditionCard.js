@@ -41,15 +41,15 @@ const TimerDiv = styled(Timer)`
   border-radius: 5px;
 `;
 
-const HeldenExpeditionCard = ({ data, refetch, slot }) => {
-  if (!data.expeditionList[slot]) {
+const HeldenExpeditionCard = ({ expedition, refetch, index }) => {
+  if (!expedition) {
     return (
       <Card>
         <div>
           <div>
             <h2> Expedition Slot</h2>
             <hr />
-            <div># {slot} - Avaliable</div>
+            <div># {index} - Avaliable</div>
           </div>
         </div>
       </Card>
@@ -57,28 +57,24 @@ const HeldenExpeditionCard = ({ data, refetch, slot }) => {
   }
   return (
     <Card>
-      {
-        data.expeditionList.map((expedition) => (
-          <div key={expedition.heldenId}>
-            <Image
-              src={`/helden${expedition.classImage}`}
-              alt={expedition.className}
-            />
-            <h2>{expedition.name}</h2>{' '}
-            <h3>
-              {expedition.className} - lvl: {expedition.lvlLevel}
-            </h3>
-            <div>
-              Time left:
-              <TimerDiv
-                className={'xyz'}
-                heldenId={expedition.heldenId}
-                refetcher={refetch}
-              />
-            </div>
-          </div>
-        ))[slot]
-      }
+      <div key={expedition.heldenId}>
+        <Image
+          src={`/helden${expedition.classImage}`}
+          alt={expedition.className}
+        />
+        <h2>{expedition.name}</h2>{' '}
+        <h3>
+          {expedition.className} - lvl: {expedition.lvlLevel}
+        </h3>
+        <div>
+          Time left:
+          <TimerDiv
+            className={'xyz'}
+            heldenId={expedition.heldenId}
+            refetcher={refetch}
+          />
+        </div>
+      </div>
     </Card>
   );
 };

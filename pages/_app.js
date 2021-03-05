@@ -1,11 +1,11 @@
-import GlobalStyle, { colors } from '../styles/globalStyles';
 import { ApolloProvider } from '@apollo/client';
-import { useApollo } from '../apollo/client';
+import Head from 'next/head';
 import { useState } from 'react';
 import styled from 'styled-components';
+import { useApollo } from '../apollo/client';
 import GameNav from '../components/GameNav';
 import GlobalNav from '../components/GlobalNav';
-import Head from 'next/head';
+import GlobalStyle, { colors } from '../styles/globalStyles';
 
 const Prompt = styled.div`
   background: rgb(48, 39, 223);

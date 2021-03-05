@@ -1,7 +1,7 @@
-import { ApolloServer, gql } from 'apollo-server-micro';
+import { ApolloServer } from 'apollo-server-micro';
 import { makeExecutableSchema } from 'graphql-tools';
-import typeDefs from '../../apollo/typeDefs';
 import resolvers from '../../apollo/resolvers';
+import typeDefs from '../../apollo/typeDefs';
 
 export const schema = makeExecutableSchema({
   typeDefs,

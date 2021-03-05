@@ -39,7 +39,6 @@ export async function getServerSideProps(context) {
     };
   }
 
-
   const {
     data: { isCombatActive },
   } = await apolloClient.query({
@@ -58,7 +57,6 @@ export async function getServerSideProps(context) {
       },
     };
   }
-
 
   await apolloClient.query({
     query: bagQuery,

@@ -65,11 +65,7 @@ const login = (props) => {
     <Form onSubmit={handleSubmit(onSubmit)}>
       playerName
       <br />
-      <input
-        name="playerName"
-        ref={register({ required: true })}
-        type="text"
-      />
+      <input name="playerName" ref={register({ required: true })} type="text" />
       {errors.palyerName && <Error>---{'>'} ups, this is required</Error>}
       <br />
       password
