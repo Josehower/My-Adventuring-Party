@@ -94,8 +94,6 @@ export async function getServerSideProps(context) {
   const { session: token } = nextCookies(context);
   const loggedIn = await isSessionTokenValid(token);
 
-
-
   if (!(await loggedIn)) {
     return {
       redirect: {
@@ -114,9 +112,6 @@ export async function getServerSideProps(context) {
       }
     `,
   });
-
-
-
 
   if (isCombatActive) {
     return {

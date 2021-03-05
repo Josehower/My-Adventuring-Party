@@ -1,5 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 const deleteCombatMutation = gql`
@@ -43,9 +43,15 @@ const DefeatFrame = (props) => {
 
   async function resetCombat() {
     props.definition('');
-    const { data } = await deleteCombat();
-    console.log(data.deleteCombat);
   }
+
+  useEffect(()=>{
+    async function reset(){
+      const { data } = await deleteCombat();
+      console.log(data.deleteCombat);
+    };
+    reset()
+      },[])
 
   return (
     <Frame>

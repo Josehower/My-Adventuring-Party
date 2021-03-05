@@ -1,36 +1,50 @@
 import { gql, useQuery } from '@apollo/client';
 import { useEffect, useState } from 'react';
+import styled from 'styled-components';
 
-const timeLeftQuery = gql`
-  query expeditionTimeLeft($heldenId: Int!) {
-    expeditionTimeLeft(heldenId: $heldenId)
+const Div = styled.div`
+  color: transparent;
+`;
+
+const endTimeQuery = gql`
+  query expeditionEndTime($heldenId: Int!) {
+    expeditionEndTime(heldenId: $heldenId)
   }
 `;
 
 const Timer = (props) => {
-  const { data, loading, error } = useQuery(timeLeftQuery, {
+  const { data, loading, error, refetch } = useQuery(endTimeQuery, {
     variables: {
       heldenId: props.heldenId,
     },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "no-cache",
   });
-  const [timeLeft, setTimeLeft] = useState(0);
+
+  const [timeLeft, setTimeLeft] = useState();
 
   useEffect(() => {
-    if (timeLeft === 0 && data) {
-      setTimeLeft(parseInt(data?.expeditionTimeLeft));
-    }
-    const timer = setInterval(() => {
-      const counter = timeLeft - 1000;
-      if (counter <= 0) {
-        props.refetcher();
-        return;
+ 
+    const interval = setInterval(()=>{ 
+      if(loading) return
+      if(timeLeft <= 0){
+        refetch();
+        return
       }
-      setTimeLeft(timeLeft - 1000);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [data, timeLeft]);
+      const now = +Date.now();
+        setTimeLeft(Number(data?.expeditionEndTime) - now)
+      },100 )
+  return ()=>clearInterval(interval)
+  }, [data]);
 
-  if (loading) return <p>loading...</p>;
+
+  if (loading || !timeLeft ){return (
+    <Div className={props.className}>
+     00:00
+    </Div>
+  )}
+
+
   if (error) return `${error}`;
 
   const daysUntilEnd = Math.floor(timeLeft / 1000 / 60 / 60 / 24);
@@ -46,9 +60,22 @@ const Timer = (props) => {
     hoursUntilEnd * 60 * 60 -
     daysUntilEnd * 24 * 60 * 60;
 
+
+
+if (timeLeft < 800) {
+  props.refetcher()
   return (
     <div className={props.className}>
-      {daysUntilEnd}:{hoursUntilEnd}:{minutesUntilEnd}:{secondsUntilEnd}
+      BACK
+    </div>)
+}
+
+  return (
+    <div className={props.className}>
+   {daysUntilEnd ? daysUntilEnd+":" : "" }
+   {hoursUntilEnd ? hoursUntilEnd+":" : ""}
+   {minutesUntilEnd ? minutesUntilEnd < 10? "0"+minutesUntilEnd+":" : minutesUntilEnd+":" : "00:"}
+   {secondsUntilEnd < 10 ? "0"+secondsUntilEnd : secondsUntilEnd}
     </div>
   );
 };

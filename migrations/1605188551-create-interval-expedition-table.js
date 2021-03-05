@@ -1,5 +1,5 @@
 const expeditionInterval = [
-  { lvl: 1, expedition_interval: '5 minutes' },
+  { lvl: 1, expedition_interval: '5 seconds' },
   { lvl: 2, expedition_interval: '40 minutes' },
   { lvl: 3, expedition_interval: '2 hours 15 minutes' },
   { lvl: 4, expedition_interval: '5 hours 20 minutes' },

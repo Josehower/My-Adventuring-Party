@@ -109,6 +109,8 @@ const Store = (props) => {
   const { register, handleSubmit, errors } = useForm();
 
   async function onSubmit(submitData) {
+   if (submitData.heldenToExpedition === "off" ) return
+  
     if (data.expeditionList.length > 4) {
       return;
     }
@@ -125,6 +127,7 @@ const Store = (props) => {
 
     refetch();
   }
+
 
   if (loading || heldenLoading) return <p>loading...</p>;
   if (error || heldenError) return `${error}`;
@@ -171,7 +174,9 @@ const Store = (props) => {
           ref={register({ required: true })}
           activeExpAmount={data.expeditionList.length}
         >
+          <option value={"off"}>Select Free Helden</option>
           {heldenListData
+            .filter(helden=>helden.partySlot=== null)
             .filter((helden) => {
               const idsOnExpeditionList = data.expeditionList.map(
                 (heldenOnExp) => heldenOnExp.heldenId,

@@ -226,7 +226,7 @@ export async function createExpeditionByHeldenId(heldenId) {
   return { message: 'your helden is on a expedition' };
 }
 
-export async function getHeldenExpeditionTimeLeft(heldenId) {
+export async function getHeldenExpeditionEndTime(heldenId) {
   console.log('getHeldenExpeditionTimeLeft', heldenId);
   const expedition = await getExpeditionByHeldenId(heldenId);
 
@@ -255,7 +255,7 @@ export async function getHeldenExpeditionTimeLeft(heldenId) {
     return false;
   }
 
-  const timeUntilExpiration = +endTime - Date.now();
 
-  return timeUntilExpiration;
+
+  return +endTime;
 }

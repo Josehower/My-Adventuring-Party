@@ -10,7 +10,7 @@ import {
 import {
   createExpeditionByHeldenId,
   getGameExpeditionList,
-  getHeldenExpeditionTimeLeft,
+  getHeldenExpeditionEndTime,
 } from '../utils/expedition-database';
 import {
   buyItemByGameId,
@@ -42,12 +42,12 @@ const resolvers = {
       return;
     },
 
-    async expeditionTimeLeft(p, args, context) {
+    async expeditionEndTime(p, args, context) {
       const isAllowed = await isThisCallAllowed(context);
       if (isAllowed) {
-        const timeLeft = await getHeldenExpeditionTimeLeft(args.heldenId);
+        const endTime = await getHeldenExpeditionEndTime(args.heldenId);
         // console.log(expeditionList);
-        return timeLeft;
+        return endTime;
       }
       return;
     },

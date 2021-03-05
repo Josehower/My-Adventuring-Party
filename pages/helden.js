@@ -223,6 +223,20 @@ const HeldenRow = styled.div`
 
 //  Mutations and Queries-----------------------
 
+const expeditionListQuery = gql`
+  query expeditionList {
+    expeditionList {
+      name
+      expeditionStartDate
+      gameId
+      lvlLevel
+      heldenId
+      className
+      classImage
+    }
+  }
+`;
+
 const veUpgradeFromItemMutation = gql`
   mutation itemVeUpgrade($heldenId: Int!, $amount: Int) {
     itemVeUpgrade(heldenId: $heldenId, amount: $amount) {
@@ -318,6 +332,8 @@ const HeldenManager = ({ setPrompt }) => {
 
   // Component queries-----------------------
 
+  const { data: {expeditionList}, _loading, _error, refetch } = useQuery(expeditionListQuery);
+console.log("expe", expeditionList)
   const {
     data: { heldenList: heldenListData },
     loading,
@@ -536,7 +552,7 @@ const HeldenManager = ({ setPrompt }) => {
               <div>{helden.stats.sd}</div>
               <div>{helden.stats.pd}</div>
               <div>
-                {helden.partySlot ? (
+{expeditionList.some(({heldenId})=> heldenId === helden.id) ? <div>expe</div> :                helden.partySlot ? (
                   <PartyButton onClick={() => removeFromParty(helden.id)}>
                     PARTY
                   </PartyButton>
@@ -545,6 +561,7 @@ const HeldenManager = ({ setPrompt }) => {
                     BENCH
                   </BenchButton>
                 )}
+
               </div>
               <DeleteHeldenButton
                 onClick={() => deleteHeldenHandler(helden.id)}
@@ -664,7 +681,7 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  
+
   const {
     data: { isCombatActive },
   } = await apolloClient.query({
@@ -685,6 +702,11 @@ export async function getServerSideProps(context) {
   }
   await apolloClient.query({
     query: heldenListQuery,
+  });
+
+
+  await apolloClient.query({
+    query: expeditionListQuery,
   });
 
   return {

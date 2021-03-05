@@ -7,7 +7,7 @@ const typeDefs = gql`
     playerBag: [BagItem]
     heldenList: [Helden]
     expeditionList: [Expedition]
-    expeditionTimeLeft(heldenId: Int!): String
+    expeditionEndTime(heldenId: Int!): String
     isCombatActive: Boolean
   }
 

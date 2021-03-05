@@ -51,7 +51,6 @@ const NavLink = styled.a`
 const GameNav = ({ loggedIn }) => {
   const router = useRouter();
 
-  console.log(loggedIn)
   if (!loggedIn) {
     return '';
   }

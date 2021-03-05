@@ -671,6 +671,7 @@ const StoryMode = (props) => {
         <SubmitButton styleCode={combatStep} onClick={handleSubmit(hit)}>
           {teamPriority[combatStep]} Go!
         </SubmitButton>
+        <button onClick={()=>setCombatDefinition("defeat")}>click</button>
       </CombatFrame>
     );
   }
