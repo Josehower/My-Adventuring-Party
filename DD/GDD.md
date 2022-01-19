@@ -43,7 +43,7 @@ Gameplay and  Mechanics
 
 # Game Progression <a id="game-progression"></a>
 
-The game progress as the diferent HELDEN on the team grow whit level, and also the player have accses to more resources because of the expedition and the treasure droped by bigger opponents.
+The game progress as the different HELDEN on the team grow whit level, and also the player have accses to more resources because of the expedition and the treasure droped by bigger opponents.
 
 each HELDEN on the first version of the game can get levels until lvl 10 that is the cap for this version, after that the HELDEN can get more stats but the cap on his stats is permanent.
 
