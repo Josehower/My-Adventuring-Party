@@ -27,4 +27,7 @@ exports.down = async (sql) => {
   await sql`
 	DROP TABLE IF EXISTS class_boost_stats_on_levelup;
 	`;
+  await sql`
+	DROP TABLE IF EXISTS class_stats_on_lvl_1;
+	`;
 };

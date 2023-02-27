@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p ${PORT:-\"3000\"}",
-    "migrate": "dotenv ley",
+    "migrate": "dotenv -- ley",
     "dbt": "yarn migrate down && yarn migrate up",
     "heroku-postbuild": "yarn migrate up && yarn build"
   },
