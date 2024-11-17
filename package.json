@@ -13,7 +13,7 @@
   "dependencies": {
     "@apollo/client": "^3.2.5",
     "apollo-server-micro": "^2.19.0",
-    "argon2": "^0.27.0",
+    "argon2": "^0.41.1",
     "camelcase-keys": "^6.2.2",
     "cookie": "^0.4.1",
     "csrf": "^3.1.0",
