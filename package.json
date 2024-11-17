@@ -11,7 +11,7 @@
     "heroku-postbuild": "yarn migrate up && yarn build"
   },
   "dependencies": {
-    "@apollo/client": "^3.2.5",
+    "@apollo/client": "^3.11.8",
     "apollo-server-micro": "^2.19.0",
     "argon2": "^0.27.0",
     "camelcase-keys": "^6.2.2",
